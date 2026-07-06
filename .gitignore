@@ -1,0 +1,98 @@
+# ==========================================
+# FastAPI & Python Core Artifacts
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ==========================================
+# Virtual Environments (Crucial for FastAPI)
+# ==========================================
+.venv/
+venv/
+ENV/
+env/
+ENV/
+pythonenv*/
+
+# ==========================================
+# Environment Variables & Secrets (NEVER Commit)
+# ==========================================
+.env
+.env.*
+!.env.example
+.secrets
+secrets.*
+
+# ==========================================
+# Database & Storage Artifacts (SQLite / Local)
+# ==========================================
+*.db
+*.sqlite
+*.sqlite3
+data/
+storage/
+
+# ==========================================
+# Testing and Coverage
+# ==========================================
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# ==========================================
+# Code Linters and Formatters
+# ==========================================
+.ruff_cache/
+.mypy_cache/
+.pyre_cache/
+.pytype_cache/
+
+# ==========================================
+# IDEs and Editors
+# ==========================================
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+
+# ==========================================
+# Operating System Files
+# ==========================================
+.DS_Store
+Thumbs.db
