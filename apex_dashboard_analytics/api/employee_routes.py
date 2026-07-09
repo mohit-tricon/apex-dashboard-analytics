@@ -2,16 +2,22 @@
 
 Two kinds of routes here:
   1. Team 5's own aggregated `/dashboard` endpoint (our design).
-  2. Endpoints that mirror Team 1 and Team 4's real contracts as
-     closely as an employee_id-scoped design allows.
+  2. Endpoints that mirror the other teams' real contracts.
 
-NOTE on Team 1 parity: Team 1's real `GET /api/v1/skill-analysis` is
-scoped to the caller's own bearer token, not an `employee_id` path
-param, so `/employees/{employee_id}/current-skills` below is NOT a
-literal proxy of their contract — it's shaped like their response
-(`SkillDetailResponse`) so the frontend can build against it, but the
-real integration needs either a manager-scoped endpoint from Team 1 or
-direct DB access. Flagged for follow-up.
+Confirmed against real contracts as of 2026-07-09:
+  - Team 4 (quizzes, quiz-attempts): matched exactly against their doc.
+  - Team 2 (roadmap): matched exactly against their live Swagger docs
+    (GET /api/v1/employees/{employee_id}/roadmap).
+
+NOT yet confirmed:
+  - Team 1 (current-skills): their real `GET /api/v1/skill-analysis` is
+    scoped to the caller's own bearer token, not an `employee_id` path
+    param, so `/employees/{employee_id}/current-skills` below is shaped
+    like their response (`SkillDetailResponse`) but is not a literal
+    proxy — the real integration needs either a manager-scoped endpoint
+    from Team 1 or direct DB access. Flagged for follow-up.
+  - Team 3 (AI Tutor): no contract shared yet. Not wired into this
+    router at all until we get one.
 """
 
 from __future__ import annotations
@@ -57,10 +63,8 @@ def get_current_skills(employee_id: str) -> SkillDetailResponse:
 
 @employee_router.get("/{employee_id}/roadmap", response_model=Roadmap)
 def get_roadmap_for_employee(employee_id: str) -> Roadmap:
-    """Convenience lookup: employee_id -> their current roadmap.
-
-    For the literal Team 2 contract (GET /{skill_id}/roadmap), see
-    the top-level roadmap route registered from roadmap_routes.py.
+    """Mirrors Team 2's confirmed real contract:
+    GET /api/v1/employees/{employee_id}/roadmap
     """
     _ensure_employee_exists(employee_id)
     roadmap = mock_store.get_roadmap_by_employee_id(employee_id)

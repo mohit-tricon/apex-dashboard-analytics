@@ -5,7 +5,6 @@ from apex_dashboard_analytics.api.executive_routes import executive_router
 from apex_dashboard_analytics.api.health_routes import health_router
 from apex_dashboard_analytics.api.manager_routes import manager_router
 from apex_dashboard_analytics.api.quiz_routes import quiz_router
-from apex_dashboard_analytics.api.roadmap_routes import roadmap_router
 
 # Versioned router — everything that mirrors or aggregates the
 # inter-team contracts lives under /api/v1, matching the base URL
@@ -16,6 +15,5 @@ v1_router.include_router(employee_router)
 v1_router.include_router(manager_router)
 v1_router.include_router(executive_router)
 v1_router.include_router(quiz_router)
-v1_router.include_router(roadmap_router)  # registered last: bare {skill_id}/roadmap path
 
 __all__ = ["v1_router", "health_router"]

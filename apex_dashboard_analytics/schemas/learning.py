@@ -1,15 +1,18 @@
 """Schemas mirroring Team 2 (Learning Recommendation Agent) contract.
 
-Source: API_Contract-Recommendation_of_courses.docx, shared 2026-07-09.
+Source: API_Contract-Recommendation_of_courses.docx (2026-07-09) +
+confirmed against Team 2's live Swagger docs (2026-07-09).
 
-Canonical endpoint (per the doc's Overview table):
-    GET /api/v1/{skill_id}/roadmap
+CONFIRMED endpoint (from Team 2's own /docs, operation id
+`get_roadmaps_by_employee_api_v1_employees__employee_id__roadmap_get`):
 
-NOTE: the same doc's "Endpoint" section shows a different, inconsistent
-URL (display text vs. hyperlink target don't match — looks like a
-copy-paste leftover pointing at an old design). Going with the Overview
-table's `/{skill_id}/roadmap` as canonical; flag this doc inconsistency
-with Team 2 so they can confirm/fix it.
+    GET /api/v1/employees/{employee_id}/roadmap
+
+This supersedes the doc's Overview table, which said `/{skill_id}/roadmap`
+— that was wrong (and the doc's "Endpoint" section had a mismatched
+display text/hyperlink on top of it, which was the first sign something
+was off). Employee-id-scoped also matches how Team 4's quiz endpoints
+are shaped, so this is consistent with the rest of the system.
 """
 
 from __future__ import annotations
@@ -43,7 +46,7 @@ class RoadmapPlan(BaseModel):
 
 
 class Roadmap(BaseModel):
-    """Response shape for GET /{skill_id}/roadmap."""
+    """Response shape for GET /employees/{employee_id}/roadmap."""
 
     roadmap_id: str
     skill_id: str
