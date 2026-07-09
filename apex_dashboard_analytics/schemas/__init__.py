@@ -10,7 +10,14 @@ from __future__ import annotations
 
 from apex_dashboard_analytics.schemas.skills import SkillDetailResponse, SkillGapItem
 from apex_dashboard_analytics.schemas.learning import Roadmap, RoadmapCourse, RoadmapPlan, RoadmapWeek
-from apex_dashboard_analytics.schemas.tutoring import TutoringSession
+from apex_dashboard_analytics.schemas.tutoring import (
+    TutoringSession,
+    UserAnalyticsSummary,
+    UserSkillInteraction,
+    UserSkillsBreakdown,
+    TutorOverviewResponse,
+    QuizResultWebhookPayload,
+)
 from apex_dashboard_analytics.schemas.quiz import (
     Pagination,
     QuizSummary,
@@ -41,6 +48,11 @@ __all__ = [
     "RoadmapPlan",
     "RoadmapWeek",
     "TutoringSession",
+    "UserAnalyticsSummary",
+    "UserSkillInteraction",
+    "UserSkillsBreakdown",
+    "TutorOverviewResponse",
+    "QuizResultWebhookPayload",
     "Pagination",
     "QuizSummary",
     "EmployeeQuizzesResponse",
