@@ -22,7 +22,8 @@ NOT yet confirmed:
 
 from __future__ import annotations
 
-from fastapi import HTTPException, Query
+import time
+from fastapi import HTTPException, Query, Request
 from fastapi.routing import APIRouter
 
 from apex_dashboard_analytics.data import mock_store
@@ -43,8 +44,12 @@ def _ensure_employee_exists(employee_id: str) -> None:
 
 
 @employee_router.get("/check/")
-def check_endpoint():
-    return {"message": "Check endpoint"}
+def check_endpoint(request: Request):
+    request.state.logger.info("This is one request logged")
+    request.state.logger.info("This is second request logged")
+    return {
+        "message": "Check endpoint"
+    }
 
 
 @employee_router.get("/{employee_id}/dashboard", response_model=EmployeeDashboard)

@@ -2,29 +2,30 @@
 
 from __future__ import annotations
 
+from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 
-from fastapi import FastAPI
-
-
 from apex_dashboard_analytics.api import health_router, v1_router
-from apex_dashboard_analytics.config import Settings, get_settings
-from apex_dashboard_analytics.logging import configure_logging, get_logger
+from apex_dashboard_analytics.core import get_settings, configure_logging, get_logger
+from apex_dashboard_analytics.middlewares import add_request_logger_middleware
 from apex_dashboard_analytics.responses import CustomJSONResponse
 
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+    configure_logging()                     # configure before creating any logger
+
+    setattr(app.state, 'logger', get_logger())    # logger available at app level for configurations
+    app.state.logger.info(f"Starting up the App {app.title}")
+
+    yield
+    app.state.logger.info("Shuting down the App")
+
+
+def create_app() -> FastAPI:
     """Create and configure a FastAPI application instance."""
-    settings = settings or get_settings()
-    configure_logging(log_level=settings.log_level, json_logs=settings.log_json)
-    log = get_logger(__name__)
-
-    @asynccontextmanager
-    async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-        log.info("startup", app_name=settings.app_name, environment=settings.environment)
-        yield
-        log.info("shutdown", app_name=settings.app_name)
+    settings = get_settings()
 
     app = FastAPI(
         title=settings.app_name,
@@ -32,6 +33,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
         default_response_class=CustomJSONResponse
     )
+
+    add_request_logger_middleware(app)
     app.include_router(health_router)
     app.include_router(v1_router, prefix="/api/v1")
     return app
@@ -39,3 +42,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
 # ASGI app for uvicorn: `uvicorn apex_dashboard_analytics.main:app`
 app = create_app()
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(
+        app=app,
+        port=8000
+    )
