@@ -30,6 +30,16 @@ class Settings(BaseSettings):
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
     log_json: bool = False
 
+    # File logging: logs are always written as JSON for easy parsing.
+    log_to_file: bool = True
+    log_file: str = "logs/app.log"
+    log_file_max_bytes: int = 10 * 1024 * 1024  # 10 MiB per file
+    log_file_backup_count: int = 5
+
+    @property
+    def is_production(self):
+        return self.environment == "production"
+
 
 @lru_cache
 def get_settings() -> Settings:

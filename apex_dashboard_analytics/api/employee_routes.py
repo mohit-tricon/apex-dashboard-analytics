@@ -24,6 +24,7 @@ from __future__ import annotations
 
 from fastapi import HTTPException, Query
 from fastapi.routing import APIRouter
+from fastapi import Request
 
 from apex_dashboard_analytics.data import mock_data
 from apex_dashboard_analytics.schemas import (
