@@ -19,8 +19,10 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-QuizStatus = Literal["passed", "failed", "in_progress", "not_started"]
-AttemptStatus = Literal["passed", "failed"]
+from apex_dashboard_analytics.constants import FAILED, IN_PROGRESS, NOT_STARTED, PASSED
+
+QuizStatus = Literal[PASSED, FAILED, IN_PROGRESS, NOT_STARTED]
+AttemptStatus = Literal[PASSED, FAILED]
 
 
 class Pagination(BaseModel):

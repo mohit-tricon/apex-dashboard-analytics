@@ -8,7 +8,7 @@ from collections.abc import AsyncIterator
 from fastapi import FastAPI
 
 
-from apex_dashboard_analytics.api import health_router, v1_router
+from apex_dashboard_analytics.api import health_router, tutor_router, v1_router
 from apex_dashboard_analytics.config import Settings, get_settings
 from apex_dashboard_analytics.logging import configure_logging, get_logger
 from apex_dashboard_analytics.responses import CustomJSONResponse
@@ -34,6 +34,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.include_router(health_router)
     app.include_router(v1_router, prefix="/api/v1")
+    app.include_router(tutor_router)  # no /api/v1 prefix — matches Team 3's literal /tutor/... paths
     return app
 
 
