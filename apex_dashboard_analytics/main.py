@@ -6,10 +6,11 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 
-from apex_dashboard_analytics.api import v1_router
+from apex_dashboard_analytics.api import health_router, tutor_router, v1_router
 from apex_dashboard_analytics.core import get_settings, configure_logging, get_logger
 from apex_dashboard_analytics.middlewares import add_request_logger_middleware
 from apex_dashboard_analytics.responses import CustomJSONResponse
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -33,15 +34,16 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
         default_response_class=CustomJSONResponse
     )
+    app.include_router(health_router)
+    app.include_router(v1_router, prefix="/api/v1")
+    app.include_router(tutor_router)  # no /api/v1 prefix — matches Team 3's literal /tutor/... paths
 
     add_request_logger_middleware(app)
-    app.include_router(v1_router)
     return app
 
 
 # ASGI app for uvicorn: `uvicorn apex_dashboard_analytics.main:app`
 app = create_app()
-
 
 if __name__ == "__main__":
     import uvicorn
