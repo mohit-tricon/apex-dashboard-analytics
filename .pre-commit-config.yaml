@@ -1,0 +1,10 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Get the latest rev using: pre-commit autoupdate
+    rev: v0.15.20 
+    hooks:
+      # Linter hook
+      - id: ruff-check
+        args: [ --fix ] # Automatically fixes safe errors during commit
+      # Formatter hook
+      - id: ruff-format
