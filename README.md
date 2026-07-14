@@ -32,6 +32,11 @@ pip install -r requirements.txt
 pip install -e ".[dev]"
 ```
 
+```bash
+# Development dependencies
+pre-commit install  # Uses pre-commit hook for code management
+```
+
 ## Run the server
 
 ```bash
