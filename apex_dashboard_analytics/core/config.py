@@ -36,9 +36,32 @@ class Settings(BaseSettings):
     log_file_max_bytes: int = 10 * 1024 * 1024  # 10 MiB per file
     log_file_backup_count: int = 5
 
+    # Database (PostgreSQL).
+    # Either set ``database_url`` directly, or the individual components below.
+    database_url: str | None = None
+    db_host: str = "localhost"
+    db_port: int = 5432
+    db_user: str = "postgres"
+    db_password: str = "postgres"
+    db_name: str = "apex_analytics"
+    db_echo: bool = False
+    db_pool_size: int = 5
+    db_max_overflow: int = 10
+    db_auto_create_tables: bool = False
+
     @property
     def is_production(self):
         return self.environment == "production"
+
+    @property
+    def sqlalchemy_dsn(self) -> str:
+        """SQLAlchemy connection string (sync psycopg driver)."""
+        if self.database_url:
+            return self.database_url
+        return (
+            f"postgresql+psycopg://{self.db_user}:{self.db_password}"
+            f"@{self.db_host}:{self.db_port}/{self.db_name}"
+        )
 
 
 @lru_cache
