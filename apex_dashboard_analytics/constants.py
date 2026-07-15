@@ -6,8 +6,13 @@ module one place to import them from instead of redefining Literal
 values inline.
 """
 
-# Quiz / assessment status values (Team 4 contract: quiz.py)
+# Quiz / assessment status values (frontend contract: quiz.py)
 PASSED = "passed"
 FAILED = "failed"
 IN_PROGRESS = "in_progress"
 NOT_STARTED = "not_started"
+
+# Assessment service upstream status values
+PASS = "pass"
+FAIL = "fail"
+PENDING = "pending"

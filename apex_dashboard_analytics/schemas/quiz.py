@@ -39,7 +39,7 @@ class QuizSummary(BaseModel):
     quiz_id: str
     skill_id: str
     course: str
-    last_score: int = Field(ge=0, le=100)
+    last_score: int | None = Field(default=None, ge=0, le=100)
     pass_threshold: int = Field(ge=0, le=100)
     status: QuizStatus
 
@@ -55,10 +55,10 @@ class EmployeeQuizzesResponse(BaseModel):
 
 class QuizAttempt(BaseModel):
     course: str
-    score: int = Field(ge=0, le=100)
+    score: int | None = Field(default=None, ge=0, le=100)
     status: AttemptStatus
-    attempted_on: datetime
-    feedback: str
+    attempted_on: datetime | None = None
+    feedback: str | None = None
 
 
 class QuizAttemptsResponse(BaseModel):
@@ -75,10 +75,10 @@ class EmployeeQuizAttempt(BaseModel):
     quiz_id: str
     skill_id: str
     course: str
-    score: int = Field(ge=0, le=100)
+    score: int | None = Field(default=None, ge=0, le=100)
     status: AttemptStatus
-    attempted_on: datetime
-    feedback: str
+    attempted_on: datetime | None = None
+    feedback: str | None = None
 
 
 class EmployeeQuizAttemptsResponse(BaseModel):

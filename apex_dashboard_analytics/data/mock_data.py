@@ -205,38 +205,38 @@ def get_roadmap_by_employee_id(employee_id: str) -> Roadmap | None:
 
 
 # --------------------------------------------------------------------------
-# Team 4 — quizzes  (mirrors 2.1 / 2.2 / 2.3 exactly)
+# Assessment — quizzes  (mirrors 2.1 / 2.2 / 2.3 exactly)
 # --------------------------------------------------------------------------
 
 _QUIZ_CATALOG: dict[str, list[dict]] = {
     "usr_9823471": [
-        {"quiz_id": "Q101", "skill_id": "108", "course": "Learning FastAPI Fundamentals", "last_score": 82, "pass_threshold": 60, "status": "passed"},
-        {"quiz_id": "Q102", "skill_id": "103", "course": "Learning Databases", "last_score": 40, "pass_threshold": 60, "status": "failed"},
+        {"quiz_id": "PY-03", "skill_id": "108", "course": "Learning FastAPI Fundamentals", "last_score": 82, "pass_threshold": 60, "status": "passed"},
+        {"quiz_id": "DB-01", "skill_id": "103", "course": "Learning Databases", "last_score": 40, "pass_threshold": 60, "status": "failed"},
     ],
     "usr_9823472": [
-        {"quiz_id": "Q201", "skill_id": "101", "course": "Python Fundamentals", "last_score": 55, "pass_threshold": 60, "status": "failed"},
+        {"quiz_id": "PY-01", "skill_id": "101", "course": "Python Fundamentals", "last_score": 55, "pass_threshold": 60, "status": "failed"},
     ],
     "usr_9823473": [
-        {"quiz_id": "Q301", "skill_id": "115", "course": "Statistics for ML", "last_score": 78, "pass_threshold": 60, "status": "passed"},
-        {"quiz_id": "Q302", "skill_id": "120", "course": "MLOps Essentials", "last_score": 45, "pass_threshold": 60, "status": "failed"},
+        {"quiz_id": "ML-01", "skill_id": "115", "course": "Statistics for ML", "last_score": 78, "pass_threshold": 60, "status": "passed"},
+        {"quiz_id": "ML-02", "skill_id": "120", "course": "MLOps Essentials", "last_score": 45, "pass_threshold": 60, "status": "failed"},
     ],
 }
 
 _QUIZ_ATTEMPTS: dict[str, list[dict]] = {
-    "Q101": [
+    "PY-03": [
         {"course": "Learning FastAPI Fundamentals", "score": 82, "status": "passed", "attempted_on": "2026-06-29T07:25:00Z", "feedback": "Solid understanding of routing and dependency injection."},
         {"course": "Learning FastAPI Fundamentals", "score": 40, "status": "failed", "attempted_on": "2026-05-29T07:25:00Z", "feedback": "Need to go properly over endpoints and request validation."},
     ],
-    "Q102": [
+    "DB-01": [
         {"course": "Learning Databases", "score": 40, "status": "failed", "attempted_on": "2026-05-20T07:25:00Z", "feedback": "Review indexing and normalization."},
     ],
-    "Q201": [
+    "PY-01": [
         {"course": "Python Fundamentals", "score": 55, "status": "failed", "attempted_on": "2026-06-01T07:25:00Z", "feedback": "Revisit list/dict comprehensions and error handling."},
     ],
-    "Q301": [
+    "ML-01": [
         {"course": "Statistics for ML", "score": 78, "status": "passed", "attempted_on": "2026-06-15T07:25:00Z", "feedback": "Good grasp of distributions and hypothesis testing."},
     ],
-    "Q302": [
+    "ML-02": [
         {"course": "MLOps Essentials", "score": 45, "status": "failed", "attempted_on": "2026-06-20T07:25:00Z", "feedback": "Focus on CI/CD for models and monitoring next."},
     ],
 }

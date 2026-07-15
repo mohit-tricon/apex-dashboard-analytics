@@ -52,6 +52,7 @@ class Settings(BaseSettings):
     # Outbound integrations (team services).
     integration_timeout_seconds: float = 30.0
     skill_profiler_base_url: str = "http://skill-profiler-service:8001"
+    assessment_base_url: str = "http://assessment-service:8004"
 
     @property
     def is_production(self):
