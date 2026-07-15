@@ -32,13 +32,19 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         pool_size=settings.db_pool_size,
         max_overflow=settings.db_max_overflow,
     )
-    if settings.db_auto_create_tables:
+    # Auto-create tables ONLY outside production. In production the schema is
+    # owned by migrations (Alembic), not by the app. create_all() is idempotent
+    # (checkfirst=True) so it never recreates existing tables, but running DDL
+    # from the app on every boot is undesirable in production.
+    if settings.db_auto_create_tables and not settings.is_production:
         try:
             db.create_all()
             logger.info("db_tables_ready")
         except Exception:
             # Don't crash startup if the DB is unreachable; log and continue.
             logger.exception("db_create_all_failed")
+    elif settings.is_production:
+        logger.info("db_schema_managed_by_migrations")
 
     yield
 

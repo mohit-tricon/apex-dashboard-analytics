@@ -20,6 +20,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    "alembic>=1.13",
+    "pre-commit==4.6.0",
     "pytest>=9.1.1",
 ]
 
