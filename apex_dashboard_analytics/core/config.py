@@ -49,6 +49,10 @@ class Settings(BaseSettings):
     db_max_overflow: int = 10
     db_auto_create_tables: bool = False
 
+    # Outbound integrations (team services).
+    integration_timeout_seconds: float = 30.0
+    skill_profiler_base_url: str = "http://skill-profiler-service:8001"
+
     @property
     def is_production(self):
         return self.environment == "production"
