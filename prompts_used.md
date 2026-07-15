@@ -146,3 +146,25 @@ Generate a FastAPI Named apex-dashboard-analytics using uv, structlog, pydantic,
 #####################################################################################################################
 
 
+<<<<<<< Updated upstream
+=======
+For all the logs corresponding to request, they all should have request_id, start time and end time
+
+Handling Integration with multiple teams
+  Develop a db connection (postgresql) in config.py and a singleton object for DB
+  Make a table integration_logs with following fields:
+      url, request_headers, response_headers, payload, response, timestamp, status_code etc. This table would maitain logs for integration irrespective of which team is integrated to.
+  Make an abstract integration class which has methods like make_request, save_to_integration_log (this method should not raise exception as it can break the integration part). All of the team-wise integration will inherit from this base class. DO NOT IMPLEMENT the child classes only the Base Class.
+  There can be application_logger logs as well.
+
+Implement a basic SkillProfilerIntegration, and how to deal in production if integration_logs not repeatedly created.
+
+Add alembic flow with migrations handling and update into .env.example as well
+
+#####################################################################################################################
+
+
+write a systemd service file, for deployment we are using systemd with current app handling service uvicorn apex_dashboard_analytics.main:app --port 8005 (no worker as of now). Don't add dependency for DB/Postgresql Service into service file.
+
+#####################################################################################################################
+>>>>>>> Stashed changes
