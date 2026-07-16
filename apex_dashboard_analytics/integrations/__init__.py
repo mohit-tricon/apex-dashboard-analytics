@@ -1,7 +1,13 @@
-from apex_dashboard_analytics.integrations.assessment import AssessmentIntegration
-from apex_dashboard_analytics.integrations.base import BaseIntegration
+from .base import BaseIntegration
+from .skill_profiler import SkillProfilerIntegration
+from .learning_assistant import LearningAssistantIntegration
 from apex_dashboard_analytics.integrations.skill_profiler import (
     SkillProfilerIntegration,
 )
 
-__all__ = ["BaseIntegration", "SkillProfilerIntegration", "AssessmentIntegration"]
+__all__ = [
+    "BaseIntegration",
+    "SkillProfilerIntegration",
+    "LearningAssistantIntegration",
+    "AssessmentIntegration"
+]
