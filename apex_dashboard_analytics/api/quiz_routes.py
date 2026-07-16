@@ -9,10 +9,11 @@ resolved from the ``X-Employee-Id`` header set by the API gateway.
 
 from __future__ import annotations
 
-from fastapi import Depends, Query
+from fastapi import Depends, HTTPException, Query
 from fastapi.routing import APIRouter
 
-from apex_dashboard_analytics.api.deps import get_scoped_employee_id
+from apex_dashboard_analytics.api.deps import get_scoped_employee_id, use_mock_data
+from apex_dashboard_analytics.data import mock_data
 from apex_dashboard_analytics.schemas import QuizAttemptsResponse
 from apex_dashboard_analytics.services.assessment_service import get_assessment_service
 
@@ -25,8 +26,14 @@ def get_quiz_attempts(
     employee_id: str = Depends(get_scoped_employee_id),
     limit: int = Query(default=20, le=100, ge=1),
     offset: int = Query(default=0, ge=0),
+    mock: bool = Depends(use_mock_data),
 ) -> QuizAttemptsResponse:
     """Mirrors assessment contract 2.2. Note: contract has no `search` param here."""
+    if mock:
+        result = mock_data.get_quiz_attempts(quiz_id, limit=limit, offset=offset)
+        if result is None or result.employee_id != employee_id:
+            raise HTTPException(status_code=404, detail=f"Quiz '{quiz_id}' not found")
+        return result
     return get_assessment_service().get_quiz_attempts(
         quiz_id, employee_id, limit=limit, offset=offset
     )

@@ -136,9 +136,29 @@ GET: /api/v1/tutoring/{id}
   "timestamp": "ISO8601"
 } 
 ##########################################################################################
-Team 4 – Assessment & quiz Agent
-GET: /api/v1/quiz/{id}/attempts
-{ score: 82, attemptCount: 2, topic: "MCP Protocol" }
+Team 4 – Assessment & Quiz Agent
+
+Frontend API contracts (do not change):
+7.1 GET /api/v1/employees/{employee_id}/quizzes?limit=20&offset=0&search=
+{"employee_id":"usr_9823471","quizzes":[{"quiz_id":"Q101","skill_id":"108","course":"Learning FastAPI Fundamentals","last_score":82,"pass_threshold":60,"status":"passed"},{"quiz_id":"Q102","skill_id":"103","course":"Learning Databases","last_score":40,"pass_threshold":60,"status":"failed"}],"pagination":{"limit":20,"offset":0,"total":6,"has_more":false}}
+
+7.2 GET /api/v1/quizzes/{quiz_id}/attempts?limit=20&offset=0
+{"employee_id":"usr_9823471","quiz_id":"Q101","attempts":[{"course":"Learning FastAPI Fundamentals","score":82,"status":"passed","attempted_on":"2026-06-29T07:25:00Z","feedback":"Solid understanding of routing and dependency injection."},{"course":"Learning FastAPI Fundamentals","score":40,"status":"failed","attempted_on":"2026-05-29T07:25:00Z","feedback":"Need to go properly over endpoints and request validation."}],"pagination":{"limit":20,"offset":0,"total":2,"has_more":false}}
+
+7.3 GET /api/v1/employees/{employee_id}/quiz-attempts?limit=20&offset=0&search=
+{"employee_id":"usr_9823471","attempts":[{"quiz_id":"Q101","skill_id":"108","course":"Learning FastAPI Fundamentals","score":82,"status":"passed","attempted_on":"2026-06-29T07:25:00Z","feedback":"Solid understanding of routing and dependency injection."}],"pagination":{"limit":20,"offset":0,"total":14,"has_more":false}}
+
+Integrate Team 4 endpoints into the above frontend contracts following Team 1's integration pattern. Frontend endpoints must not change.
+
+Team 4 upstream APIs:
+GET /assessment/results/employees/{user_id}/assessments?limit=20&offset=0  → 7.1
+{"user_id":"emp-101","assessments":[{"assessment_id":"asmt-11932d82","course_id":"PY-03","course":"Python FastAPI Fundamentals","last_score":null,"pass_threshold":60,"status":"pending"},{"assessment_id":"asmt-c7edec19","course_id":"PY-01","course":"Python","last_score":7,"pass_threshold":60,"status":"pass"}],"pagination":{"limit":20,"offset":0,"total":2,"has_more":false}}
+
+GET /assessment/results/employees/{user_id}/assessment-attempts?limit=20&offset=0  → 7.3
+{"user_id":"emp-101","attempts":[{"assessment_id":"asmt-11932d82","course_id":"PY-03","course":"Python FastAPI Fundamentals","score":null,"status":"pending","attempted_on":null,"feedback":null},{"assessment_id":"asmt-c7edec19","course_id":"PY-01","course":"Python","score":7,"status":"pass","attempted_on":"2026-07-13T11:38:18.081612Z","feedback":"Good effort overall; focusing on loops and OOP concepts will boost your mastery and bring scores up."}],"pagination":{"limit":20,"offset":0,"total":2,"has_more":false}}
+
+GET /assessment/results/courses/{course_id}/assessment-attempts?limit=20&offset=0  → 7.2
+{"course_id":"PY-03","attempts":[{"user_id":"emp-102","assessment_id":"asmt-14a79cf4","score":10,"status":"pass","attempted_on":"2026-07-14T06:12:36.730025Z"},{"user_id":"emp-101","assessment_id":"asmt-11932d82","score":null,"status":"pending","attempted_on":null}],"pagination":{"limit":20,"offset":0,"total":2,"has_more":false}}
 
 #####################################################################################################################
 Generate a FastAPI Named apex-dashboard-analytics using uv, structlog, pydantic, uvicorn and pytest as dependencies.
