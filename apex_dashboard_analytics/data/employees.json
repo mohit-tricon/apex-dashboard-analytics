@@ -71,6 +71,13 @@
       "strongestSkill": "Python",
       "weakestSkill": "FastAPI",
       "quizPassRate": 50.0
+    },
+    "roadmap": {
+      "totalWeeks": 4,
+      "completedWeeks": 2,
+      "completionPercentage": 50,
+      "currentWeek": 2,
+      "nextFocus": "FastAPI Routing"
     }
   },
   "usr_9823472": {
@@ -132,7 +139,7 @@
         "reason": "Python skill below expected level"
       },
       {
-        "course": "Learning FastAPI Fundamentals",
+        "course": "Database Optimizations",
         "priority": "Medium",
         "reason": "Required for target role Python Dev"
       }
@@ -141,6 +148,13 @@
       "strongestSkill": "SQL",
       "weakestSkill": "Python",
       "quizPassRate": 0.0
+    },
+    "roadmap": {
+      "totalWeeks": 11,
+      "completedWeeks": 7,
+      "completionPercentage": 64,
+      "currentWeek": 7,
+      "nextFocus": "Database production handling"
     }
   },
   "usr_9823473": {
@@ -216,5 +230,12 @@
       "weakestSkill": "MLOps",
       "quizPassRate": 50.0
     }
+  },
+  "roadmap": {
+    "totalWeeks": 7,
+    "completedWeeks": 2,
+    "completionPercentage": 29,
+    "currentWeek": 2,
+    "nextFocus": "KV Caching"
   }
 }
