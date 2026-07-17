@@ -34,6 +34,7 @@ from apex_dashboard_analytics.schemas import (
     SkillDetailResponse,
 )
 from apex_dashboard_analytics.schemas.learning import Roadmap
+from apex_dashboard_analytics.integrations.learning_assistant import get_emmployee_courses
 
 employee_router = APIRouter(prefix="/employees", tags=["employee"])
 
@@ -51,9 +52,12 @@ def check_endpoint():
 @employee_router.get("/{employee_id}/dashboard", response_model=EmployeeDashboard)
 def get_employee_dashboard(employee_id: str) -> EmployeeDashboard:
     """Single aggregated payload for rendering the whole Employee View."""
-    _ensure_employee_exists(employee_id)
-    return mock_data.get_employee_dashboard(employee_id)
-
+    # _ensure_employee_exists(employee_id)
+    # response =  dict(mock_data.get_employee_dashboard("usr_9823471"))
+    response = {}
+    response.update({"courses": get_emmployee_courses(employee_id), "employee_id": employee_id})
+    response = EmployeeDashboard(**response)
+    return response
 
 @employee_router.get("/{employee_id}/current-skills", response_model=SkillDetailResponse)
 def get_current_skills(employee_id: str) -> SkillDetailResponse:
@@ -62,15 +66,12 @@ def get_current_skills(employee_id: str) -> SkillDetailResponse:
     return mock_data.get_skill_detail(employee_id)
 
 
-@employee_router.get("/{employee_id}/roadmap", response_model=Roadmap)
+@employee_router.get("/{employee_id}/roadmap", response_model=list[Roadmap])
 def get_roadmap_for_employee(employee_id: str) -> Roadmap:
     """Mirrors Team 2's confirmed real contract:
     GET /api/v1/employees/{employee_id}/roadmap
     """
-    _ensure_employee_exists(employee_id)
-    roadmap = mock_data.get_roadmap_by_employee_id(employee_id)
-    if roadmap is None:
-        raise HTTPException(status_code=404, detail=f"No roadmap found for employee '{employee_id}'")
+    roadmap = get_emmployee_courses(employee_id)
     return roadmap
 
 

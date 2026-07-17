@@ -57,7 +57,6 @@ class LearningAssistantIntegration(BaseIntegration):
             json=dict(payload),
         )
 
-        response.raise_for_status()
         return response.json()
 
     # ------------------------------------------------------------------
@@ -77,7 +76,6 @@ class LearningAssistantIntegration(BaseIntegration):
             f"/api/v1/skills/{skill_id}/roadmap",
         )
 
-        response.raise_for_status()
         return response.json()
 
     def get_employee_roadmaps(
@@ -101,7 +99,6 @@ class LearningAssistantIntegration(BaseIntegration):
             params=params,
         )
 
-        response.raise_for_status()
         return response.json()
 
     # ------------------------------------------------------------------
@@ -123,3 +120,21 @@ class LearningAssistantIntegration(BaseIntegration):
 
         except Exception:
             return False
+
+
+def get_emmployee_courses(employee_id) -> list[dict, str]:
+    """Get all courses for a given employee from the Learning Assistant service."""
+    integration = LearningAssistantIntegration()
+    roadmaps = integration.get_employee_roadmaps(employee_id)
+    all_courses = []
+
+    for roadmap in roadmaps:
+        for week in roadmap.get("plan", {}).get("weeks", []):
+            for course in week.get("courses", []):
+                all_courses.append({
+                    "course_name": course.get("course_name"),
+                    "provider": course.get("provider"),
+                    "url": course.get("url")
+                })
+
+    return all_courses

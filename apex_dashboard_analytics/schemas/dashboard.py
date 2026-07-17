@@ -42,11 +42,12 @@ class EmployeeDashboard(BaseModel):
     """Aggregated payload for the Employee View."""
 
     employee_id: str
-    skill_profile: SkillDetailResponse
-    roadmap: Roadmap | None = None
-    quizzes: EmployeeQuizzesResponse
-    recent_quiz_attempts: EmployeeQuizAttemptsResponse
-    summary: EmployeeDashboardSummary
+    course_recommendations: list
+    # skill_profile: SkillDetailResponse
+    # roadmap: Roadmap | None = None
+    # quizzes: EmployeeQuizzesResponse
+    # recent_quiz_attempts: EmployeeQuizAttemptsResponse
+    # summary: EmployeeDashboardSummary
 
 
 # ----------------------------------------------------------------- Manager
