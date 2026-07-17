@@ -5,7 +5,7 @@ Two kinds of routes here:
   2. Endpoints that mirror the other teams' real contracts.
 
 Confirmed against real contracts as of 2026-07-09:
-  - Team 4 (quizzes, quiz-attempts): matched exactly against their doc.
+  - Assessment (quizzes, quiz-attempts): matched exactly against their doc.
   - Team 2 (roadmap): matched exactly against their live Swagger docs
     (GET /api/v1/employees/{employee_id}/roadmap).
 
@@ -22,10 +22,10 @@ NOT yet confirmed:
 
 from __future__ import annotations
 
-from fastapi import HTTPException, Query
+from fastapi import Depends, HTTPException, Query
 from fastapi.routing import APIRouter
-from fastapi import Request
 
+from apex_dashboard_analytics.api.deps import use_mock_data
 from apex_dashboard_analytics.data import mock_data
 from apex_dashboard_analytics.schemas import (
     EmployeeDashboard,
@@ -33,6 +33,7 @@ from apex_dashboard_analytics.schemas import (
     EmployeeQuizzesResponse,
     SkillDetailResponse,
 )
+from apex_dashboard_analytics.services.assessment_service import get_assessment_service
 from apex_dashboard_analytics.schemas.learning import Roadmap
 from apex_dashboard_analytics.integrations.learning_assistant import get_emmployee_courses
 
@@ -81,10 +82,17 @@ def get_employee_quizzes(
     limit: int = Query(default=20, le=100, ge=1),
     offset: int = Query(default=0, ge=0),
     search: str | None = Query(default=None, description="Filter by course name (case-insensitive)"),
+    mock: bool = Depends(use_mock_data),
 ) -> EmployeeQuizzesResponse:
-    """Mirrors Team 4 contract 2.1: GET /api/v1/employees/{employee_id}/quizzes."""
+    """Mirrors assessment contract 2.1: GET /api/v1/employees/{employee_id}/quizzes."""
     _ensure_employee_exists(employee_id)
-    return mock_data.get_employee_quizzes(employee_id, limit=limit, offset=offset, search=search)
+    if mock:
+        return mock_data.get_employee_quizzes(
+            employee_id, limit=limit, offset=offset, search=search
+        )
+    return get_assessment_service().get_employee_quizzes(
+        employee_id, limit=limit, offset=offset, search=search
+    )
 
 
 @employee_router.get("/{employee_id}/quiz-attempts", response_model=EmployeeQuizAttemptsResponse)
@@ -93,7 +101,14 @@ def get_employee_quiz_attempts(
     limit: int = Query(default=20, le=100, ge=1),
     offset: int = Query(default=0, ge=0),
     search: str | None = Query(default=None, description="Filter by course or skill name (case-insensitive)"),
+    mock: bool = Depends(use_mock_data),
 ) -> EmployeeQuizAttemptsResponse:
-    """Mirrors Team 4 contract 2.3: GET /api/v1/employees/{employee_id}/quiz-attempts (cross-quiz)."""
+    """Mirrors assessment contract 2.3: GET /api/v1/employees/{employee_id}/quiz-attempts (cross-quiz)."""
     _ensure_employee_exists(employee_id)
-    return mock_data.get_employee_quiz_attempts(employee_id, limit=limit, offset=offset, search=search)
+    if mock:
+        return mock_data.get_employee_quiz_attempts(
+            employee_id, limit=limit, offset=offset, search=search
+        )
+    return get_assessment_service().get_employee_quiz_attempts(
+        employee_id, limit=limit, offset=offset, search=search
+    )
