@@ -166,3 +166,8 @@ Implement a basic SkillProfilerIntegration, and how to deal in production if int
 Add alembic flow with migrations handling and update into .env.example as well
 
 #####################################################################################################################
+
+
+write a systemd service file, for deployment we are using systemd with current app handling service uvicorn apex_dashboard_analytics.main:app --port 8005 (no worker as of now). Don't add dependency for DB/Postgresql Service into service file.
+
+#####################################################################################################################

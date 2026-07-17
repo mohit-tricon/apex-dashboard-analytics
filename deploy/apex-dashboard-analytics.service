@@ -1,0 +1,61 @@
+# systemd unit for apex-dashboard-analytics (FastAPI + uvicorn)
+#
+# Install (replace {user} with the deploy user everywhere below):
+#   sudo cp deploy/apex-dashboard-analytics.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now apex-dashboard-analytics
+#
+# Assumptions (adjust to match your deployment):
+#   * App deployed at   /home/{user}/apex-dashboard-analytics
+#   * Virtualenv at     /home/{user}/apex-dashboard-analytics/.venv
+#     (created with `python -m venv .venv && .venv/bin/pip install -e .`)
+#   * Config in         /home/{user}/apex-dashboard-analytics/.env
+#
+# NOTE: no DB/PostgreSQL dependency here. Run migrations separately, e.g.
+#   /home/{user}/apex-dashboard-analytics/.venv/bin/apex-dashboard-analytics db upgrade head
+
+[Unit]
+Description=Apex Dashboard Analytics (FastAPI)
+Documentation=https://opencode.ai/docs
+# Start once the network is up. Intentionally NO postgresql.service dependency.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User={user}
+Group={user}
+
+WorkingDirectory=/home/{user}/apex-dashboard-analytics
+# pydantic-settings also reads ./.env from WorkingDirectory; EnvironmentFile
+# makes the same values available to the process env explicitly. Keep in sync.
+EnvironmentFile=/home/{user}/apex-dashboard-analytics/.env
+Environment=ENVIRONMENT=production
+
+# Serve the app (single process, no workers for now).
+ExecStart=/home/{user}/apex-dashboard-analytics/.venv/bin/uvicorn apex_dashboard_analytics.main:app --port 8005
+
+# Restart policy
+Restart=on-failure
+RestartSec=3
+# Graceful shutdown lets uvicorn finish in-flight requests.
+KillSignal=SIGINT
+TimeoutStopSec=30
+
+# --- Security hardening -------------------------------------------------------
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+# App lives under /home, so /home must stay accessible (ProtectHome would hide it).
+ProtectHome=false
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+# The app writes rotating logs under logs/ (LOG_FILE). ProtectSystem=strict
+# makes the tree read-only, so allow writes to the log directory.
+ReadWritePaths=/home/{user}/apex-dashboard-analytics/logs
+
+[Install]
+WantedBy=multi-user.target
