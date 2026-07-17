@@ -54,6 +54,7 @@ class Settings(BaseSettings):
     skill_profiler_base_url: str = "http://skill-profiler-service:8001"
     assessment_base_url: str = "http://assessment-service:8004"
     learning_assistant_base_url: str = "http://learning-assistant-service:8002"
+    ai_tutor_base_url: str = "http://ai-tutor-service:8003"
 
     @property
     def is_production(self):
