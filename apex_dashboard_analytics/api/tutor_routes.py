@@ -14,17 +14,12 @@ from __future__ import annotations
 from datetime import date, timedelta
 
 from fastapi import HTTPException, Query
-from fastapi.responses import JSONResponse
 from fastapi.routing import APIRouter
 
 from apex_dashboard_analytics.data import mock_data
 from apex_dashboard_analytics.schemas import EmployeeAnalyticsSummary, EmployeeSkillAnalytics, TutorAnalyticsOverview
 
-tutor_router = APIRouter(
-    prefix="/tutor/analytics",
-    tags=["tutor-analytics"],
-    default_response_class=JSONResponse,
-)
+tutor_router = APIRouter(prefix="/tutor/analytics", tags=["tutor-analytics"])
 
 
 @tutor_router.get("/user/{user_id}/summary", response_model=EmployeeAnalyticsSummary)

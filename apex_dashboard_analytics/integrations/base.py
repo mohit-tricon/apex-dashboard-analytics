@@ -88,9 +88,7 @@ class BaseIntegration(ABC):
         re-raised to the caller after the log row has been written.
         """
         url = self._build_url(path)
-        request_headers = dict(self.default_headers)
-        if headers:
-            request_headers.update(headers)
+        request_headers = {**self.default_headers, **(headers or {})}
         request_id = self._current_request_id()
         payload = json if json is not None else data
 
@@ -114,7 +112,6 @@ class BaseIntegration(ABC):
                     json=json,
                     data=data,
                 )
-            assert response is not None
             status_code = response.status_code
             response_headers = dict(response.headers)
             response_body = response.text
