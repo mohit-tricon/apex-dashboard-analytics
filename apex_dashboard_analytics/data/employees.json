@@ -1,0 +1,220 @@
+{
+  "usr_9823471": {
+    "employee": {
+      "id": "usr_9823471",
+      "name": "Asha Verma",
+      "designation": "Python Dev",
+      "department": "Backend & Cloud Engineering",
+      "manager": "mgr_1001"
+    },
+    "summary": {
+      "currentSkillScore": 78,
+      "learningProgress": 50,
+      "quizAverage": 61,
+      "certificationsEarned": 2
+    },
+    "charts": {
+      "skillTrend": [
+        {
+          "month": "Jan",
+          "score": 61
+        },
+        {
+          "month": "Feb",
+          "score": 64
+        },
+        {
+          "month": "Mar",
+          "score": 68
+        },
+        {
+          "month": "Apr",
+          "score": 71
+        },
+        {
+          "month": "May",
+          "score": 75
+        },
+        {
+          "month": "Jun",
+          "score": 78
+        }
+      ],
+      "skillDistribution": [
+        {
+          "skill": "Python",
+          "score": 92
+        },
+        {
+          "skill": "FastAPI",
+          "score": 68
+        },
+        {
+          "skill": "AWS Cloud Architecture",
+          "score": 74
+        }
+      ]
+    },
+    "course_recommendations": [
+      {
+        "course": "Learning FastAPI Fundamentals",
+        "priority": "High",
+        "reason": "FastAPI skill below expected level"
+      },
+      {
+        "course": "Kubernetes Fundamentals",
+        "priority": "Medium",
+        "reason": "Required for target role FastAPI Dev"
+      }
+    ],
+    "analytics": {
+      "strongestSkill": "Python",
+      "weakestSkill": "FastAPI",
+      "quizPassRate": 50.0
+    }
+  },
+  "usr_9823472": {
+    "employee": {
+      "id": "usr_9823472",
+      "name": "Rohit Nair",
+      "designation": "Junior Developer",
+      "department": "Backend & Cloud Engineering",
+      "manager": "mgr_1001"
+    },
+    "summary": {
+      "currentSkillScore": 58,
+      "learningProgress": 0,
+      "quizAverage": 55,
+      "certificationsEarned": 0
+    },
+    "charts": {
+      "skillTrend": [
+        {
+          "month": "Jan",
+          "score": 41
+        },
+        {
+          "month": "Feb",
+          "score": 44
+        },
+        {
+          "month": "Mar",
+          "score": 48
+        },
+        {
+          "month": "Apr",
+          "score": 51
+        },
+        {
+          "month": "May",
+          "score": 55
+        },
+        {
+          "month": "Jun",
+          "score": 58
+        }
+      ],
+      "skillDistribution": [
+        {
+          "skill": "Python",
+          "score": 55
+        },
+        {
+          "skill": "SQL",
+          "score": 60
+        }
+      ]
+    },
+    "course_recommendations": [
+      {
+        "course": "Python Fundamentals",
+        "priority": "High",
+        "reason": "Python skill below expected level"
+      },
+      {
+        "course": "Learning FastAPI Fundamentals",
+        "priority": "Medium",
+        "reason": "Required for target role Python Dev"
+      }
+    ],
+    "analytics": {
+      "strongestSkill": "SQL",
+      "weakestSkill": "Python",
+      "quizPassRate": 0.0
+    }
+  },
+  "usr_9823473": {
+    "employee": {
+      "id": "usr_9823473",
+      "name": "Priya Shah",
+      "designation": "Data Analyst",
+      "department": "Data & ML",
+      "manager": "mgr_1001"
+    },
+    "summary": {
+      "currentSkillScore": 67,
+      "learningProgress": 50,
+      "quizAverage": 61.5,
+      "certificationsEarned": 2
+    },
+    "charts": {
+      "skillTrend": [
+        {
+          "month": "Jan",
+          "score": 50
+        },
+        {
+          "month": "Feb",
+          "score": 53
+        },
+        {
+          "month": "Mar",
+          "score": 57
+        },
+        {
+          "month": "Apr",
+          "score": 60
+        },
+        {
+          "month": "May",
+          "score": 64
+        },
+        {
+          "month": "Jun",
+          "score": 67
+        }
+      ],
+      "skillDistribution": [
+        {
+          "skill": "Python",
+          "score": 80
+        },
+        {
+          "skill": "Statistics",
+          "score": 75
+        },
+        {
+          "skill": "MLOps",
+          "score": 45
+        }
+      ]
+    },
+    "course_recommendations": [
+      {
+        "course": "MLOps Essentials",
+        "priority": "High",
+        "reason": "MLOps skill below expected level"
+      },
+      {
+        "course": "Model Evaluation & Monitoring",
+        "priority": "Medium",
+        "reason": "Required for target role ML Engineer"
+      }
+    ],
+    "analytics": {
+      "strongestSkill": "Python",
+      "weakestSkill": "MLOps",
+      "quizPassRate": 50.0
+    }
+  }
+}
