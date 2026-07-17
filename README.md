@@ -53,8 +53,6 @@ Then open:
 Configuration is loaded from environment variables a
 `.env` file. See `.env.example`.
 
-<<<<<<< Updated upstream
-=======
 ## Database migrations (Alembic)
 
 The schema is managed by Alembic. Config lives in `alembic.ini` (scripts in
@@ -146,37 +144,6 @@ apex-dashboard-analytics db upgrade head --sql # offline SQL
 Running `apex-dashboard-analytics` with no arguments (or `serve`) starts the
 uvicorn server.
 
-## Deployment (systemd)
-
-A unit file is provided at `deploy/apex-dashboard-analytics.service`. It runs
-the app with uvicorn (`--port 8005`, single process) as a dedicated user, and
-intentionally has **no** DB/PostgreSQL dependency — run migrations separately.
-
-1. Replace `{user}` throughout the unit file with your deploy user, and adjust
-   the paths (defaults assume `/home/{user}/apex-dashboard-analytics` with a
-   `.venv` created via `python -m venv .venv && .venv/bin/pip install -e .`).
-2. Ensure `.env` exists (plain `KEY=value` lines — systemd does no shell
-   expansion) and the `logs/` directory is writable.
-3. Run any pending migrations (the service does not do this for you):
-
-   ```bash
-   .venv/bin/apex-dashboard-analytics db upgrade head
-   ```
-
-4. Install and start the service:
-
-   ```bash
-   sudo cp deploy/apex-dashboard-analytics.service /etc/systemd/system/
-   sudo systemctl daemon-reload
-   sudo systemctl enable --now apex-dashboard-analytics
-   sudo systemctl status apex-dashboard-analytics
-   journalctl -u apex-dashboard-analytics -f      # follow logs (JSON in journal)
-   ```
-
-The unit sets `Environment=ENVIRONMENT=production`, so the app never runs DDL at
-startup; the schema is owned by Alembic migrations.
-
->>>>>>> Stashed changes
 ## Testing
 ### (under progress)
 ```bash

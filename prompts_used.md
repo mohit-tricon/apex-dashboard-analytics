@@ -141,13 +141,17 @@ GET: /api/v1/quiz/{id}/attempts
 { score: 82, attemptCount: 2, topic: "MCP Protocol" }
 
 #####################################################################################################################
-Generate a FastAPI Named apex-dashboard-analytics using uv, structlog, pydantic, uvicorn and pytest as dependencies
+Generate a FastAPI Named apex-dashboard-analytics using uv, structlog, pydantic, uvicorn and pytest as dependencies.
+
+#####################################################################################################################
+
+Follow best practices to use structlog
+Handling Logging at Application and Request Level
+Implement a logging middleware in middlewares/logging.py
 
 #####################################################################################################################
 
 
-<<<<<<< Updated upstream
-=======
 For all the logs corresponding to request, they all should have request_id, start time and end time
 
 Handling Integration with multiple teams
@@ -167,4 +171,3 @@ Add alembic flow with migrations handling and update into .env.example as well
 write a systemd service file, for deployment we are using systemd with current app handling service uvicorn apex_dashboard_analytics.main:app --port 8005 (no worker as of now). Don't add dependency for DB/Postgresql Service into service file.
 
 #####################################################################################################################
->>>>>>> Stashed changes
