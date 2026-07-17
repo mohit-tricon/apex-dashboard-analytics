@@ -1,0 +1,92 @@
+{
+  "mgr_1001": {
+    "manager": {
+      "id": "mgr_1001",
+      "name": "Meera Iyer",
+      "department": "Backend & Cloud Engineering"
+    },
+    "summary": {
+      "teamSize": 3,
+      "averageSkillScore": 68,
+      "averageLearningProgress": 33,
+      "pendingTrainings": 6,
+      "certificationCompletion": 44
+    },
+    "charts": {
+      "teamSkillDistribution": [
+        {
+          "skill": "Python",
+          "employees": 3
+        },
+        {
+          "skill": "FastAPI",
+          "employees": 1
+        },
+        {
+          "skill": "AWS Cloud Architecture",
+          "employees": 1
+        },
+        {
+          "skill": "SQL",
+          "employees": 1
+        },
+        {
+          "skill": "Statistics",
+          "employees": 1
+        },
+        {
+          "skill": "MLOps",
+          "employees": 1
+        }
+      ]
+    },
+    "skillGaps": [
+      {
+        "skill": "FastAPI",
+        "employeesAffected": 2
+      },
+      {
+        "skill": "Kubernetes",
+        "employeesAffected": 1
+      },
+      {
+        "skill": "Python",
+        "employeesAffected": 1
+      },
+      {
+        "skill": "MLOps",
+        "employeesAffected": 1
+      },
+      {
+        "skill": "Model Evaluation",
+        "employeesAffected": 1
+      }
+    ],
+    "teamMembers": [
+      {
+        "employeeId": "usr_9823471",
+        "name": "Asha Verma",
+        "skillScore": 78,
+        "learningProgress": 50
+      },
+      {
+        "employeeId": "usr_9823472",
+        "name": "Rohit Nair",
+        "skillScore": 58,
+        "learningProgress": 0
+      },
+      {
+        "employeeId": "usr_9823473",
+        "name": "Priya Shah",
+        "skillScore": 67,
+        "learningProgress": 50
+      }
+    ],
+    "analytics": {
+      "topPerformer": "Asha Verma",
+      "lowestPerformer": "Rohit Nair",
+      "trainingCompletionRate": 40,
+      "averageQuizScore": 59.2
+    }
+  }
+}
