@@ -13,6 +13,13 @@ from apex_dashboard_analytics.core.config import get_settings
 from apex_dashboard_analytics.integrations.base import BaseIntegration
 
 
+def _authorization_header(token: str | None) -> dict[str, str]:
+    if not token:
+        return {}
+    value = token if token.lower().startswith("bearer ") else f"Bearer {token}"
+    return {"Authorization": value}
+
+
 class AssessmentIntegration(BaseIntegration):
     """Client for the Assessment service."""
 
@@ -24,10 +31,11 @@ class AssessmentIntegration(BaseIntegration):
         default_headers: Mapping[str, str] | None = None,
     ) -> None:
         settings = get_settings()
+        headers = {**_authorization_header(settings.assessment_api_token), **(default_headers or {})}
         super().__init__(
             base_url or settings.assessment_base_url,
             timeout=timeout or settings.integration_timeout_seconds,
-            default_headers=default_headers,
+            default_headers=headers,
         )
 
     @property

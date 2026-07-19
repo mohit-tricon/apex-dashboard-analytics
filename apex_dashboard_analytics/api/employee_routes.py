@@ -109,8 +109,8 @@ def get_employee_quizzes(
     mock: bool = Depends(use_mock_data),
 ) -> EmployeeQuizzesResponse:
     """Mirrors assessment contract 2.1: GET /api/v1/employees/{employee_id}/quizzes."""
-    _ensure_employee_exists(employee_id)
     if mock:
+        _ensure_employee_exists(employee_id)
         return mock_data.get_employee_quizzes(
             employee_id, limit=limit, offset=offset, search=search
         )
@@ -132,8 +132,8 @@ def get_employee_quiz_attempts(
     mock: bool = Depends(use_mock_data),
 ) -> EmployeeQuizAttemptsResponse:
     """Mirrors assessment contract 2.3: GET /api/v1/employees/{employee_id}/quiz-attempts (cross-quiz)."""
-    _ensure_employee_exists(employee_id)
     if mock:
+        _ensure_employee_exists(employee_id)
         return mock_data.get_employee_quiz_attempts(
             employee_id, limit=limit, offset=offset, search=search
         )
