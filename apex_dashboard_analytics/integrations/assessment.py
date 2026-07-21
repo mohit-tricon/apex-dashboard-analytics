@@ -31,7 +31,10 @@ class AssessmentIntegration(BaseIntegration):
         default_headers: Mapping[str, str] | None = None,
     ) -> None:
         settings = get_settings()
-        headers = {**_authorization_header(settings.assessment_api_token), **(default_headers or {})}
+        headers = {
+            **_authorization_header(settings.assessment_api_token),
+            **(default_headers or {}),
+        }
         super().__init__(
             base_url or settings.assessment_base_url,
             timeout=timeout or settings.integration_timeout_seconds,
@@ -51,6 +54,24 @@ class AssessmentIntegration(BaseIntegration):
         search: str | None = None,
     ) -> dict[str, Any]:
         """Fetch paginated assessment summaries for an employee."""
+        """Expected Response
+            {
+            "user_id": "string",
+            "assessments": [
+                {
+                "assessment_id": "string",
+                "course_id": "string",
+                "course": "string",
+                "last_score": 0,
+                "pass_threshold": 0,
+                "status": "string"
+                }
+            ],
+            "pagination": {
+                "additionalProp1": {}
+            }
+            }
+        """
         params: dict[str, Any] = {"limit": limit, "offset": offset}
         if search:
             params["search"] = search
@@ -59,7 +80,6 @@ class AssessmentIntegration(BaseIntegration):
             f"/assessment/results/employees/{user_id}/assessments",
             params=params,
         )
-        response.raise_for_status()
         return response.json()
 
     def get_employee_assessment_attempts(
@@ -71,6 +91,25 @@ class AssessmentIntegration(BaseIntegration):
         search: str | None = None,
     ) -> dict[str, Any]:
         """Fetch paginated cross-assessment attempt history for an employee."""
+        """Expected Response
+            {
+            "user_id": "string",
+            "attempts": [
+                {
+                "assessment_id": "string",
+                "course_id": "string",
+                "course": "string",
+                "score": 0,
+                "status": "string",
+                "attempted_on": "2026-07-21T07:31:23.088Z",
+                "feedback": "string"
+                }
+            ],
+            "pagination": {
+                "additionalProp1": {}
+            }
+            }
+        """
         params: dict[str, Any] = {"limit": limit, "offset": offset}
         if search:
             params["search"] = search
@@ -79,7 +118,6 @@ class AssessmentIntegration(BaseIntegration):
             f"/assessment/results/employees/{user_id}/assessment-attempts",
             params=params,
         )
-        response.raise_for_status()
         return response.json()
 
     def get_course_assessment_attempts(
@@ -96,7 +134,6 @@ class AssessmentIntegration(BaseIntegration):
             f"/assessment/results/courses/{course_id}/assessment-attempts",
             params=params,
         )
-        response.raise_for_status()
         return response.json()
 
     def health_check(self) -> bool:

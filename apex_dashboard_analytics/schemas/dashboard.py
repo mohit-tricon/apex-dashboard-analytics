@@ -21,10 +21,6 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from apex_dashboard_analytics.schemas.learning import Roadmap
-from apex_dashboard_analytics.schemas.quiz import EmployeeQuizAttemptsResponse, EmployeeQuizzesResponse
-from apex_dashboard_analytics.schemas.skills import SkillDetailResponse
-
 
 # ---------------------------------------------------------------- Employee
 
@@ -42,7 +38,12 @@ class EmployeeDashboard(BaseModel):
     """Aggregated payload for the Employee View."""
 
     employee_id: str
-    course_recommendations: list
+    course_recommendations: list = []
+    summary: dict = {}
+    charts: dict = {}
+    analytics: dict = {}
+    roadmap: dict = {}
+
     # skill_profile: SkillDetailResponse
     # roadmap: Roadmap | None = None
     # quizzes: EmployeeQuizzesResponse

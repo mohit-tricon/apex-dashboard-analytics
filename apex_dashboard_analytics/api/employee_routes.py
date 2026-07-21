@@ -28,7 +28,6 @@ from fastapi.routing import APIRouter
 from apex_dashboard_analytics.api.deps import use_mock_data
 from apex_dashboard_analytics.data import mock_data, mock_json
 from apex_dashboard_analytics.schemas import (
-    EmployeeDashboard,
     EmployeeQuizAttemptsResponse,
     EmployeeQuizzesResponse,
     SkillDetailResponse,
@@ -38,6 +37,7 @@ from apex_dashboard_analytics.schemas.learning import Roadmap
 from apex_dashboard_analytics.integrations.learning_assistant import (
     get_emmployee_courses,
 )
+from apex_dashboard_analytics.services.dashboard_service import EmployeeDashboardService
 
 
 employee_router = APIRouter(prefix="/employees", tags=["employee"])
@@ -51,28 +51,32 @@ def _ensure_employee_exists(employee_id: str) -> None:
 
 
 @employee_router.get("/{employee_id}/dashboard")
-def get_employee_dashboard(
+async def get_employee_dashboard(
     employee_id: str,
+    use_actual_data: bool = Query(
+        default=False,
+        description="When true, assemble the dashboard from live integrations. "
+        "Defaults to false, which returns mock data from data/employees.json.",
+    ),
 ):
     """Single aggregated payload for rendering the whole Employee View.
 
-    In mock mode (``use_mock``/``X-Use-Mock-Data``) the payload is read from
-    ``data/employees.json``; otherwise it is assembled from live integrations.
+    By default (``use_actual_data=false``) the payload is read from
+    ``data/employees.json``. When ``use_actual_data=true`` it is assembled by
+    concurrently fanning out to the SkillProfiler, Assessment, AITutor and
+    LearningAssistant integrations, returning partial data with a per-section
+    status block.
     """
 
-    data = mock_json.get_employee_dashboard(employee_id)
-    if data is None:
-        raise HTTPException(
-            status_code=404, detail=f"Employee '{employee_id}' not found"
-        )
-    return data
+    if not use_actual_data:
+        data = mock_json.get_employee_dashboard(employee_id)
+        if data is None:
+            raise HTTPException(
+                status_code=404, detail=f"Employee '{employee_id}' not found"
+            )
+        return data
 
-    response = {}
-    response.update(
-        {"courses": get_emmployee_courses(employee_id), "employee_id": employee_id}
-    )
-    response = EmployeeDashboard(**response)
-    return response
+    return await EmployeeDashboardService(employee_id=employee_id).build()
 
 
 @employee_router.get("/check/")

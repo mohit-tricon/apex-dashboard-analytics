@@ -40,7 +40,7 @@ pre-commit install  # Uses pre-commit hook for code management
 ## Run the server
 
 ```bash
-uvicorn apex_dashboard_analytics.main:app --reload --
+uvicorn apex_dashboard_analytics.main:app --reload
 ```
 
 Then open:
@@ -52,6 +52,73 @@ Then open:
 
 Configuration is loaded from environment variables a
 `.env` file. See `.env.example`.
+
+## Employee Dashboard endpoint
+
+`GET /api/v1/employees/{employee_id}/dashboard`
+
+Returns one aggregated payload for the Employee View. It has two modes,
+selected by a query flag:
+
+| `use_actual_data` | Source | Behaviour |
+| ----------------- | ------ | --------- |
+| `false` (default) | `data/employees.json` (via `data/mock_json.py`) | Returns the mock payload for `employee_id`; `404` if unknown. |
+| `true` | Live team integrations | Concurrently fans out to the 4 team services and assembles the same shape. |
+
+### Live request flow (`use_actual_data=true`)
+
+```
+Request ─▶ RequestLoggingMiddleware (binds request_id, timing)
+        ─▶ employee_routes.get_employee_dashboard()
+        ─▶ EmployeeDashboardService.build()
+             └─ gather_sections()  ── asyncio.gather + anyio.to_thread ──┐
+                 ├ SkillProfiler.get_skill_profile / get_user_profile    │  (sync httpx
+                 ├ Assessment.get_employee_assessments / ..._attempts    │   calls run
+                 ├ AITutor.get_user_summary / get_user_skills            │   in worker
+                 └ LearningAssistant.get_employee_roadmaps               │   threads,
+                                                                         │   concurrently)
+             ◀── SectionResult{status, data, duration_ms} per call ◀─────┘
+             └─ dashboard_parsers: parse_* (normalize) → assemble_employee_dashboard()
+        ─▶ CustomJSONResponse (wraps in {data, meta})
+```
+
+### How it works
+
+- **Concurrency (latency):** the ~7 independent upstream calls are sync
+  (`httpx.Client`), so they're fanned out across the AnyIO worker-thread pool
+  with `asyncio.gather`. Total latency ≈ the slowest call, not the sum. Each
+  integration instance reuses one pooled HTTP client across its calls.
+- **Timeouts:** every call has a per-call timeout (`integration_timeout_seconds`)
+  and the whole fan-out has an overall budget (`dashboard_total_timeout_seconds`).
+- **Partial results / resilience:** a failing or slow upstream never breaks the
+  dashboard. `gather_sections` isolates each call as `ok` / `error` / `timeout`;
+  the assembler tolerates missing sections and defaults them.
+- **Parsing (no fabrication):** `dashboard_parsers.parse_*` map each raw upstream
+  response into normalized sections; `assemble_employee_dashboard()` builds the
+  final `employees.json` shape purely from response data. Fields with no
+  upstream attribute are `null` (scalars) or `[]` (lists).
+- **Per-call auditing:** every outbound HTTP call goes through
+  `BaseIntegration.make_request`, which times it, emits a structured log, and
+  persists a row to `integration_logs` (logging failures never break the call).
+- **Correlation:** the request middleware binds a `request_id` that appears on
+  every app log line and on each `integration_logs` row for that request.
+
+### Response shape
+
+Matches one employee entry in `data/employees.json`:
+`employee`, `summary`, `charts` (`skillTrend`, `skillDistribution`),
+`course_recommendations`, `analytics`, `roadmap` — wrapped by
+`CustomJSONResponse` as `{ "data": { ... }, "meta": { ... } }`.
+
+### Examples
+
+```bash
+# default -> mock data
+curl "http://localhost:8000/api/v1/employees/usr_9823471/dashboard"
+
+# live aggregation from the team integrations
+curl "http://localhost:8000/api/v1/employees/usr_9823471/dashboard?use_actual_data=true"
+```
 
 ## Database migrations (Alembic)
 
@@ -148,4 +215,23 @@ uvicorn server.
 ### (under progress)
 ```bash
 pytest
+```
+
+
+## Configuring PythonPath (For testing on local)
+Linux/Mac Environment
+```bash
+export PYTHONPATH="/path/to/project:$PYTHONPATH"
+```
+
+Windows Environment
+
+Powershell
+```powershell
+$env:PYTHONPATH="C:\path\to\project;$env:PYTHONPATH"
+```
+CMD
+
+```cmd
+set PYTHONPATH=C:\path\to\project;%PYTHONPATH%
 ```

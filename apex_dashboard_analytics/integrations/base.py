@@ -52,6 +52,35 @@ class BaseIntegration(ABC):
         self.default_headers = dict(default_headers or {})
         # Application logger (distinct from the DB integration log).
         self.application_logger = get_logger(f"integration.{self.integration_name}")
+        # Lazily-created, reusable HTTP client (connection pooling / keep-alive).
+        # Reused across calls on the same instance; close via close() / `with`.
+        self._client: httpx.Client | None = None
+
+    # ------------------------------------------------------------------ #
+    # Client lifecycle
+    # ------------------------------------------------------------------ #
+    def _get_client(self) -> httpx.Client:
+        """Return the reusable HTTP client, creating it on first use."""
+        if self._client is None or self._client.is_closed:
+            self._client = httpx.Client(
+                timeout=self.timeout,
+                limits=httpx.Limits(
+                    max_keepalive_connections=10,
+                    max_connections=20,
+                ),
+            )
+        return self._client
+
+    def close(self) -> None:
+        """Close the underlying HTTP client and its connection pool."""
+        if self._client is not None and not self._client.is_closed:
+            self._client.close()
+
+    def __enter__(self) -> "BaseIntegration":
+        return self
+
+    def __exit__(self, *exc_info) -> None:
+        self.close()
 
     # ------------------------------------------------------------------ #
     # Subclass contract
@@ -103,15 +132,15 @@ class BaseIntegration(ABC):
             "integration_request_started", method=method, url=url
         )
         try:
-            with httpx.Client(timeout=timeout or self.timeout) as client:
-                response = client.request(
-                    method,
-                    url,
-                    headers=request_headers,
-                    params=params,
-                    json=json,
-                    data=data,
-                )
+            response = self._get_client().request(
+                method,
+                url,
+                headers=request_headers,
+                params=params,
+                json=json,
+                data=data,
+                timeout=timeout or self.timeout,
+            )
             status_code = response.status_code
             response_headers = dict(response.headers)
             response_body = response.text
@@ -142,6 +171,86 @@ class BaseIntegration(ABC):
                 error=error,
                 request_id=request_id,
             )
+
+    # async def make_request(
+    #     self,
+    #     method: str,
+    #     path: str = "",
+    #     *,
+    #     headers: Mapping[str, str] | None = None,
+    #     params: Mapping[str, Any] | None = None,
+    #     json: Any | None = None,
+    #     data: Any | None = None,
+    #     timeout: float | None = None,
+    #     client: httpx.AsyncClient | None = None,  # Pass a persistent client!
+    # ) -> httpx.Response:
+
+    #     url = self._build_url(path)
+    #     request_headers = {**self.default_headers, **(headers or {})}
+    #     request_id = self._current_request_id()
+    #     payload = json if json is not None else data
+
+    #     started = time.perf_counter()
+    #     response: httpx.Response | None = None
+    #     status_code: int | None = None
+    #     response_headers: dict[str, str] | None = None
+    #     response_body: str | None = None
+    #     error: str | None = None
+
+    #     self.application_logger.info(
+    #         "integration_request_started", method=method, url=url
+    #     )
+
+    #     try:
+    #         # Re-use an existing AsyncClient if passed in; otherwise fallback
+    #         async_client = client or httpx.AsyncClient(
+    #             timeout=timeout or self.timeout
+    #         )
+
+    #         # Use await for native non-blocking request
+    #         response = await async_client.request(
+    #             method,
+    #             url,
+    #             headers=request_headers,
+    #             params=params,
+    #             json=json,
+    #             data=data,
+    #         )
+
+    #         status_code = response.status_code
+    #         response_headers = dict(response.headers)
+    #         response_body = response.text
+    #         self.application_logger.info(
+    #             "integration_request_finished",
+    #             method=method,
+    #             url=url,
+    #             status_code=status_code,
+    #             duration_ms=self._elapsed_ms(started),
+    #         )
+    #         return response
+    #     except Exception as exc:
+    #         error = repr(exc)
+    #         self.application_logger.exception(
+    #             "integration_request_failed", method=method, url=url
+    #         )
+    #         raise
+    #     finally:
+    #         # If client was created inline (fallback mode), close it
+    #         if client is None:
+    #             await async_client.aclose()
+
+    #         self.save_to_integration_log(
+    #             url=url,
+    #             method=method,
+    #             request_headers=self._redact(request_headers),
+    #             response_headers=self._redact(response_headers),
+    #             payload=payload,
+    #             response=response_body,
+    #             status_code=status_code,
+    #             duration_ms=self._elapsed_ms(started),
+    #             error=error,
+    #             request_id=request_id,
+    #         )
 
     # ------------------------------------------------------------------ #
     # Persistence (must never raise)

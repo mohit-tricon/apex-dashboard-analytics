@@ -54,8 +54,24 @@ class AITutorIntegration(BaseIntegration):
             "GET",
             f"/tutor/analytics/user/{user_id}/summary",
         )
+        """Expected Response
+            {
+            "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "total_sessions": 0,
+            "total_messages": 0,
+            "total_questions_asked": 0,
+            "total_documents_uploaded": 0,
+            "avg_messages_per_session": 0,
+            "grounded_response_rate": 0,
+            "feedback_given": 0,
+            "thumbs_up_rate": 0,
+            "first_interaction": "2026-07-21T07:32:36.311Z",
+            "last_interaction": "2026-07-21T07:32:36.311Z",
+            "active_skills_count": 0,
+            "completed_skills_count": 0
+            }
+        """
 
-        response.raise_for_status()
         return response.json()
 
     def get_user_skills(
@@ -65,12 +81,35 @@ class AITutorIntegration(BaseIntegration):
         """
         GET /tutor/analytics/user/{user_id}/skills
         """
+
+        """Expected Response
+            {
+        "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "skills": [
+            {
+            "skill_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "skill_name": "string",
+            "skill_level": "string",
+            "target_role": "string",
+            "session_count": 0,
+            "total_messages": 0,
+            "total_questions": 0,
+            "documents_uploaded": 0,
+            "grounded_response_rate": 0,
+            "thumbs_up_rate": 0,
+            "last_interaction": "2026-07-21T07:33:54.554Z",
+            "top_topics_asked": [],
+            "guardrail_blocks": 0
+            }
+        ]
+        }
+        """
+
         response = self.make_request(
             "GET",
             f"/tutor/analytics/user/{user_id}/skills",
         )
 
-        response.raise_for_status()
         return response.json()
 
     def get_overview(
@@ -94,7 +133,6 @@ class AITutorIntegration(BaseIntegration):
             params=params,
         )
 
-        response.raise_for_status()
         return response.json()
 
     # ------------------------------------------------------------------

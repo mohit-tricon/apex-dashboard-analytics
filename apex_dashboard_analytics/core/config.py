@@ -51,10 +51,17 @@ class Settings(BaseSettings):
 
     # Outbound integrations (team services).
     integration_timeout_seconds: float = 30.0
+    # Overall wall-clock budget for the aggregated dashboard fan-out.
+    dashboard_total_timeout_seconds: float = 8.0
+
     skill_profiler_base_url: str = "http://skill-profiler-service:8001"
+    skill_profiler_api_key: str | None = None
+
     assessment_base_url: str = "http://assessment-service:8004"
     assessment_api_token: str | None = None
+
     learning_assistant_base_url: str = "http://learning-assistant-service:8002"
+
     ai_tutor_base_url: str = "http://ai-tutor-service:8003"
 
     @property
