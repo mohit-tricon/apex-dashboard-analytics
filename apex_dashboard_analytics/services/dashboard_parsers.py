@@ -526,7 +526,7 @@ def assemble_manager_dashboard(
     skill_scores = _numbers([x.get("skillScore") for x in members])
     progress = _numbers([x.get("learningProgress") for x in members])
     quiz_avgs = _numbers([x.get("quizAverage") for x in members])
-    pass_rates = _numbers([x.get("quizPassRate") for x in members])
+    pass_rates = _numbers([x.get("quizAverage") for x in members])
     cert_ratios = _numbers([x.get("certificationRatio") for x in members])
 
     scored = [x for x in members if isinstance(x.get("skillScore"), (int, float))]

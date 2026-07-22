@@ -162,7 +162,9 @@ class ManagerDashboardService:
             parsers.parse_skill_profile(skills.get_skill_profile(eid))
         )
         calls[f"assess_{employee_id}"] = lambda eid=employee_id: (
-            parsers.parse_assessments(assessment.get_employee_assessments(eid))
+            parsers.parse_assessment_attempts(
+                assessment.get_employee_assessment_attempts(eid)
+            )
         )
         calls[f"roadmap_{employee_id}"] = lambda eid=employee_id: parsers.parse_roadmap(
             learning.get_employee_roadmaps(eid)
