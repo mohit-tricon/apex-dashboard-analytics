@@ -14,6 +14,7 @@ from __future__ import annotations
 from collections import Counter
 from statistics import mean
 from typing import Any
+from datetime import datetime
 
 _PASSED = "passed"
 
@@ -104,6 +105,35 @@ def parse_skill_profile(raw: Any) -> dict[str, Any]:
 # --------------------------------------------------------------------------- #
 # Assessment
 # --------------------------------------------------------------------------- #
+
+
+def _get_average_latest_score(attempts: list) -> int:
+    # Dictionary to keep track of the latest attempt for each course
+    latest_attempts = {}
+
+    for attempt in attempts:
+        course_id = attempt["course_id"]
+        # Convert ISO timestamp string into a datetime object for comparison
+        attempted_on = datetime.fromisoformat(
+            attempt["attempted_on"].replace("Z", "+00:00")
+        )
+
+        # If course not seen yet or this attempt is newer, update the record
+        if (
+            course_id not in latest_attempts
+            or attempted_on > latest_attempts[course_id]["attempted_on"]
+        ):
+            latest_attempts[course_id] = {
+                "score": attempt["score"],
+                "attempted_on": attempted_on,
+            }
+
+    # Extract scores from the latest attempts
+    latest_scores = [item.get("score", 0) for item in latest_attempts.values()]
+
+    return sum(latest_scores) / len(latest_scores) if latest_scores else 0
+
+
 def parse_assessments(raw: dict[str, Any] | None) -> dict[str, Any]:
     """Parse the employee assessments response -> quiz summary + metrics."""
     raw = raw or {}
@@ -153,7 +183,11 @@ def parse_assessment_attempts(raw: dict[str, Any] | None) -> dict[str, Any]:
     ]
     # Most recent first when timestamps are present.
     attempts.sort(key=lambda a: a.get("attempted_on") or "", reverse=True)
-    return {"attempts": attempts, "total": len(attempts)}
+    return {
+        "attempts": attempts,
+        "total": len(attempts),
+        "quizAverage": _get_average_latest_score(attempts=attempts),
+    }
 
 
 # --------------------------------------------------------------------------- #
@@ -255,7 +289,7 @@ def parse_roadmap(raw: Any) -> dict[str, Any]:
         "completionPercentage": None,
         "currentWeek": None,
         "nextFocus": None,
-        "course_recommendations": []
+        "course_recommendations": [],
     }
     roadmaps = [r for r in _as_list(raw) if isinstance(r, dict)]
     if not roadmaps:
@@ -270,7 +304,7 @@ def parse_roadmap(raw: Any) -> dict[str, Any]:
         total = len(weeks)
 
     # Completion info is only reported when the response provides it.
-    has_completion = any(_week_has_completion(w) for w in weeks)
+    # has_completion = any(_week_has_completion(w) for w in weeks)
     # if not has_completion:
     #     return {**empty, "totalWeeks": total}
 
@@ -285,11 +319,13 @@ def parse_roadmap(raw: Any) -> dict[str, Any]:
 
     for week in weeks:
         for course in week.get("courses", []):
-            all_courses.append({
-                "course_name": course.get("course_name"),
-                "provider": course.get("provider"),
-                "url": course.get("url")
-            })
+            all_courses.append(
+                {
+                    "course_name": course.get("course_name"),
+                    "provider": course.get("provider"),
+                    "url": course.get("url"),
+                }
+            )
 
     return {
         "totalWeeks": total,
@@ -355,7 +391,6 @@ def assemble_employee_dashboard(
             "skillTrend": [],
             "skillDistribution": sp.get("skillDistribution") or [],
         },
-
         "course_recommendations": rd.get("course_recommendations", []),
         "analytics": {
             "strongestSkill": sp.get("strongestSkill"),

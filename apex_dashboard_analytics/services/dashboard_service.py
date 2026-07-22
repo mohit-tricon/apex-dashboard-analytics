@@ -95,7 +95,6 @@ class EmployeeDashboardService:
         calls = {
             "skill_profile": self._skill_profile,
             "user_profile": self._user_profile,
-            # "assessments": self._assessments,
             "assessment_attempts": self._assessment_attempts,
             "tutor_summary": self._tutor_summary,
             "tutor_skills": self._tutor_skills,
@@ -110,19 +109,14 @@ class EmployeeDashboardService:
             )
         finally:
             await anyio.to_thread.run_sync(self.close)
-
-        # Failed/timed-out sections are logged inside gather_sections; here we
-        # tolerate them and let the assembler default missing pieces.
-        def data(label: str) -> Any:
-            result = results.get(label)
-            return result.data if result and result.ok else None
+        # skill_result = _section(results, f"skill_{uid}")
 
         return parsers.assemble_employee_dashboard(
             self.employee_id,
-            user_profile=data("user_profile"),
-            skill_profile=data("skill_profile"),
-            assessments=data("assessments"),
-            roadmap=data("roadmap"),
+            user_profile=_section(results, "user_profile"),
+            skill_profile=_section(results, "skill_profile"),
+            assessments=_section(results, "assessment_attempts"),
+            roadmap=_section(results, "roadmap"),
         )
 
 
@@ -314,6 +308,9 @@ class ExecutiveDashboardService:
 
 
 def _section(results: dict[str, Any], label: str) -> Any:
+    # Failed/timed-out sections are logged inside gather_sections; here we
+    # tolerate them and let the assembler default missing pieces.
+
     """Return a section's parsed data if it succeeded, else None."""
     result = results.get(label)
     return result.data if result and result.ok else None

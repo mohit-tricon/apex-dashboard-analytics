@@ -134,20 +134,3 @@ class AITutorIntegration(BaseIntegration):
         )
 
         return response.json()
-
-    # ------------------------------------------------------------------
-    # Health
-    # ------------------------------------------------------------------
-
-    def health_check(self) -> bool:
-        """
-        Returns True if AI Tutor is reachable.
-        """
-        try:
-            response = self.make_request(
-                "GET",
-                "/health",
-            )
-            return response.status_code == 200
-        except Exception:
-            return False
