@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 from fastapi.middleware.cors import CORSMiddleware
 
-from apex_dashboard_analytics.api import health_router, tutor_router, v1_router
+from apex_dashboard_analytics.api import health_router, v1_router
 from apex_dashboard_analytics.core import get_settings, configure_logging, get_logger
 from apex_dashboard_analytics.core.database import db
 from apex_dashboard_analytics.middlewares import add_request_logger_middleware
@@ -65,9 +65,6 @@ def create_app() -> FastAPI:
     )
     app.include_router(health_router)
     app.include_router(v1_router, prefix="/api/v1")
-    app.include_router(
-        tutor_router
-    )  # no /api/v1 prefix — matches Team 3's literal /tutor/... paths
 
     add_request_logger_middleware(app)
     app.add_middleware(
