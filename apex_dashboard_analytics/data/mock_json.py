@@ -38,6 +38,4 @@ def get_executive_dashboard(executive_id: str | None = None) -> dict[str, Any] |
     (the Executive view endpoint is not id-scoped).
     """
     data = _load("executive.json")
-    if executive_id is not None:
-        return data.get(executive_id)
-    return next(iter(data.values()), None)
+    return data

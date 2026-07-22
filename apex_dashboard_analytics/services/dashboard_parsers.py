@@ -620,7 +620,6 @@ def assemble_executive_dashboard(
 
     return {
         "Executive": {
-            "name": name,
             "departments": len(departments) if departments else None,
         },
         "summary": {
@@ -647,4 +646,6 @@ def assemble_executive_dashboard(
             ),
             "lowestPerformingDepartment": lowest.get("department") if lowest else None,
         },
+        "top_skills": overview.get("top_skills"),
+        "top_ungrounded_skills": overview.get("top_ungrounded_skills"),
     }
