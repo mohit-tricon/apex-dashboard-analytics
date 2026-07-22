@@ -1,6 +1,7 @@
-import time
-
+from datetime import datetime, timezone
 from typing import Any
+
+import structlog
 from fastapi.responses import JSONResponse
 
 
@@ -16,12 +17,16 @@ class CustomJSONResponse(JSONResponse):
         status_code: int = 200,
         headers: dict = None,
         media_type: str = None,
-        background = None,
+        background=None,
         request_id: str = None,
-        api_version: str = "1.0"
+        api_version: str = "1.0",
     ) -> None:
-        # Generate request ID if not provided
-        self.request_id = request_id or "NA"
+        # Read from structlog contextvars when not explicitly passed
+        if request_id is None:
+            ctx = structlog.contextvars.get_contextvars()
+            request_id = ctx.get("request_id", "NA")
+
+        self.request_id = request_id
         self.api_version = api_version
 
         # Wrap content with metadata
@@ -29,9 +34,9 @@ class CustomJSONResponse(JSONResponse):
             "data": content,
             "meta": {
                 "request_id": self.request_id,
-                "timestamp": time.time(),
-                "api_version": self.api_version
-            }
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "api_version": self.api_version,
+            },
         }
 
         # Initialize headers dict if None
@@ -46,5 +51,5 @@ class CustomJSONResponse(JSONResponse):
             status_code=status_code,
             headers=headers,
             media_type=media_type,
-            background=background
+            background=background,
         )
