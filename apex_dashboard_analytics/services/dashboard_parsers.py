@@ -255,6 +255,7 @@ def parse_roadmap(raw: Any) -> dict[str, Any]:
         "completionPercentage": None,
         "currentWeek": None,
         "nextFocus": None,
+        "course_recommendations": []
     }
     roadmaps = [r for r in _as_list(raw) if isinstance(r, dict)]
     if not roadmaps:
@@ -270,8 +271,8 @@ def parse_roadmap(raw: Any) -> dict[str, Any]:
 
     # Completion info is only reported when the response provides it.
     has_completion = any(_week_has_completion(w) for w in weeks)
-    if not has_completion:
-        return {**empty, "totalWeeks": total}
+    # if not has_completion:
+    #     return {**empty, "totalWeeks": total}
 
     completed = sum(1 for w in weeks if _week_completed(w))
     current = min(completed + 1, total) if total else None
@@ -280,6 +281,15 @@ def parse_roadmap(raw: Any) -> dict[str, Any]:
         if not _week_completed(w):
             next_focus = w.get("focus")
             break
+    all_courses = []
+
+    for week in weeks:
+        for course in week.get("courses", []):
+            all_courses.append({
+                "course_name": course.get("course_name"),
+                "provider": course.get("provider"),
+                "url": course.get("url")
+            })
 
     return {
         "totalWeeks": total,
@@ -287,6 +297,7 @@ def parse_roadmap(raw: Any) -> dict[str, Any]:
         "completionPercentage": round(completed / total * 100) if total else None,
         "currentWeek": current,
         "nextFocus": next_focus,
+        "course_recommendations": all_courses,
     }
 
 
@@ -320,6 +331,7 @@ def assemble_employee_dashboard(
     up = user_profile or {}
     sp = skill_profile or {}
     asmt = assessments or {}
+    rd = roadmap or {}
 
     return {
         "employee": {
@@ -343,8 +355,8 @@ def assemble_employee_dashboard(
             "skillTrend": [],
             "skillDistribution": sp.get("skillDistribution") or [],
         },
-        # No recommendations response wired yet.
-        "course_recommendations": [],
+
+        "course_recommendations": rd.get("course_recommendations", []),
         "analytics": {
             "strongestSkill": sp.get("strongestSkill"),
             "weakestSkill": sp.get("weakestSkill"),
