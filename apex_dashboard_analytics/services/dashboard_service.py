@@ -95,7 +95,7 @@ class EmployeeDashboardService:
         calls = {
             "skill_profile": self._skill_profile,
             "user_profile": self._user_profile,
-            "assessments": self._assessments,
+            # "assessments": self._assessments,
             "assessment_attempts": self._assessment_attempts,
             "tutor_summary": self._tutor_summary,
             "tutor_skills": self._tutor_skills,
