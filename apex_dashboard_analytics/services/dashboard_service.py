@@ -162,7 +162,9 @@ class ManagerDashboardService:
             parsers.parse_skill_profile(skills.get_skill_profile(eid))
         )
         calls[f"assess_{employee_id}"] = lambda eid=employee_id: (
-            parsers.parse_assessments(assessment.get_employee_assessments(eid))
+            parsers.parse_assessment_attempts(
+                assessment.get_employee_assessment_attempts(eid)
+            )
         )
         calls[f"roadmap_{employee_id}"] = lambda eid=employee_id: parsers.parse_roadmap(
             learning.get_employee_roadmaps(eid)
@@ -266,20 +268,15 @@ class ExecutiveDashboardService:
     (pass parsed rollups via ``assemble_executive_dashboard(departments=...)``).
     """
 
-    def __init__(self, *, name: str | None = None) -> None:
-        self.name = name
+    def __init__(self) -> None:
         self._tutor = AITutorIntegration()
-        self._skills = SkillProfilerIntegration()
 
     def _org_overview(self) -> Any:
         raw = self._tutor.get_overview()
         return parsers.parse_org_overview(raw)
 
-    def _skill_catalog(self) -> Any:
-        return self._skills.list_skills()
-
     def close(self) -> None:
-        for integration in (self._tutor, self._skills):
+        for integration in (self._tutor,):
             try:
                 integration.close()
             except Exception:  # noqa: BLE001 - never fail on cleanup
@@ -289,7 +286,6 @@ class ExecutiveDashboardService:
         settings = get_settings()
         calls = {
             "org_overview": self._org_overview,
-            "skill_catalog": self._skill_catalog,
         }
         try:
             results = await gather_sections(
@@ -301,7 +297,6 @@ class ExecutiveDashboardService:
             await anyio.to_thread.run_sync(self.close)
 
         return parsers.assemble_executive_dashboard(
-            name=self.name,
             overview=_section(results, "org_overview"),
             departments=[],  # no per-department rollup endpoint upstream yet
         )

@@ -1,72 +1,70 @@
 {
-  "exec_001": {
-    "Executive": {
-      "name": "Vikram Rao",
-      "departments": 2
-    },
-    "summary": {
-      "overallAIReadiness": 71,
-      "overallLearningCompletion": 33,
-      "trainingROI": 2.3,
-      "trainingCost": 52000.0,
-      "certificationRate": 44,
-      "averageSkillScore": 68
-    },
-    "charts": {
-      "departmentReadiness": [
-        {
-          "department": "Backend & Cloud Engineering",
-          "score": 76
-        },
-        {
-          "department": "Data & ML",
-          "score": 68
-        }
-      ],
-      "monthlyAIReadinessTrend": [
-        {
-          "month": "Jan",
-          "score": 57
-        },
-        {
-          "month": "Feb",
-          "score": 60
-        },
-        {
-          "month": "Mar",
-          "score": 63
-        },
-        {
-          "month": "Apr",
-          "score": 65
-        },
-        {
-          "month": "May",
-          "score": 68
-        },
-        {
-          "month": "Jun",
-          "score": 71
-        }
-      ]
-    },
-    "departmentAnalytics": [
+  "Executive": {
+    "name": "Vikram Rao",
+    "departments": 2
+  },
+  "summary": {
+    "overallAIReadiness": 71,
+    "overallLearningCompletion": 33,
+    "trainingROI": 2.3,
+    "trainingCost": 52000.0,
+    "certificationRate": 44,
+    "averageSkillScore": 68
+  },
+  "charts": {
+    "departmentReadiness": [
       {
         "department": "Backend & Cloud Engineering",
-        "employees": 2,
-        "avgSkillScore": 68,
-        "completion": 25
+        "score": 76
       },
       {
         "department": "Data & ML",
-        "employees": 1,
-        "avgSkillScore": 67,
-        "completion": 50
+        "score": 68
       }
     ],
-    "analytics": {
-      "highestPerformingDepartment": "Backend & Cloud Engineering",
-      "lowestPerformingDepartment": "Data & ML"
+    "monthlyAIReadinessTrend": [
+      {
+        "month": "Jan",
+        "score": 57
+      },
+      {
+        "month": "Feb",
+        "score": 60
+      },
+      {
+        "month": "Mar",
+        "score": 63
+      },
+      {
+        "month": "Apr",
+        "score": 65
+      },
+      {
+        "month": "May",
+        "score": 68
+      },
+      {
+        "month": "Jun",
+        "score": 71
+      }
+    ]
+  },
+  "departmentAnalytics": [
+    {
+      "department": "Backend & Cloud Engineering",
+      "employees": 2,
+      "avgSkillScore": 68,
+      "completion": 25
+    },
+    {
+      "department": "Data & ML",
+      "employees": 1,
+      "avgSkillScore": 67,
+      "completion": 50
     }
+  ],
+  "analytics": {
+    "highestPerformingDepartment": "Backend & Cloud Engineering",
+    "lowestPerformingDepartment": "Data & ML"
   }
 }

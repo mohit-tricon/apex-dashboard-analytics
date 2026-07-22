@@ -9,9 +9,7 @@ from __future__ import annotations
 from fastapi import HTTPException, Query
 from fastapi.routing import APIRouter
 
-from apex_dashboard_analytics.data import mock_data, mock_json
-from apex_dashboard_analytics.schemas import DepartmentSkillEntry
-from apex_dashboard_analytics.schemas.dashboard import TrainingROI
+from apex_dashboard_analytics.data import mock_json
 from apex_dashboard_analytics.services.dashboard_service import (
     ExecutiveDashboardService,
 )
@@ -41,17 +39,17 @@ async def get_executive_dashboard(
     return await ExecutiveDashboardService().build()
 
 
-@executive_router.get("/ai-readiness-score")
-def get_ai_readiness_score() -> dict:
-    dashboard = mock_data.get_executive_dashboard()
-    return {"org_ai_readiness_score": dashboard.org_ai_readiness_score}
+# @executive_router.get("/ai-readiness-score")
+# def get_ai_readiness_score() -> dict:
+#     dashboard = mock_data.get_executive_dashboard()
+#     return {"org_ai_readiness_score": dashboard.org_ai_readiness_score}
 
 
-@executive_router.get("/department-skills", response_model=list[DepartmentSkillEntry])
-def get_department_skills() -> list[DepartmentSkillEntry]:
-    return mock_data.get_executive_dashboard().department_skills
+# @executive_router.get("/department-skills", response_model=list[DepartmentSkillEntry])
+# def get_department_skills() -> list[DepartmentSkillEntry]:
+#     return mock_data.get_executive_dashboard().department_skills
 
 
-@executive_router.get("/training-roi", response_model=TrainingROI)
-def get_training_roi() -> TrainingROI:
-    return mock_data.get_executive_dashboard().training_roi
+# @executive_router.get("/training-roi", response_model=TrainingROI)
+# def get_training_roi() -> TrainingROI:
+#     return mock_data.get_executive_dashboard().training_roi

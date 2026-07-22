@@ -128,11 +128,11 @@ class SkillProfilerIntegration(BaseIntegration):
 
         return response.json()
 
-    def list_skills(self, *, params: Mapping[str, Any] | None = None) -> dict[str, Any]:
-        """List available skills (optionally filtered via query params)."""
-        response = self.make_request("GET", "/skills", params=params)
+    # def list_skills(self, *, params: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    #     """List available skills (optionally filtered via query params)."""
+    #     response = self.make_request("GET", "/skills", params=params)
 
-        return response.json()
+    #     return response.json()
 
     # Not using this method, hence deprecating
     # def upsert_skill_profile(
@@ -155,9 +155,3 @@ class SkillProfilerIntegration(BaseIntegration):
     #     except Exception:
     #         # make_request already logged + persisted the failure.
     #         return False
-
-
-if __name__ == "__main__":
-    integration = SkillProfilerIntegration()
-    response = integration.get_skill_profile("02120dd4-9d27-4b79-8d4a-cbe52191a79a")
-    print(response)
