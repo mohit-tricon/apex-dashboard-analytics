@@ -130,8 +130,15 @@ def _get_average_latest_score(attempts: list) -> int:
 
     # Extract scores from the latest attempts
     latest_scores = [item.get("score", 0) for item in latest_attempts.values()]
+    latest_passed = sum(
+        1 for item in latest_attempts.values() if item.get("status") == "pass"
+    )
+    learning_progress = round((latest_passed / len(latest_attempts)) * 100, 2)
 
-    return sum(latest_scores) / len(latest_scores) if latest_scores else 0
+    return {
+        "quizAverage": sum(latest_scores) / len(latest_scores),
+        "learning_progress": learning_progress,
+    }
 
 
 def parse_assessments(raw: dict[str, Any] | None) -> dict[str, Any]:
@@ -183,10 +190,15 @@ def parse_assessment_attempts(raw: dict[str, Any] | None) -> dict[str, Any]:
     ]
     # Most recent first when timestamps are present.
     attempts.sort(key=lambda a: a.get("attempted_on") or "", reverse=True)
+    passed_courses = {
+        item["course_id"] for item in attempts if item.get("status") == "pass"
+    }
+
     return {
         "attempts": attempts,
         "total": len(attempts),
-        "quizAverage": _get_average_latest_score(attempts=attempts),
+        "certifications_earned": len(passed_courses),
+        **_get_average_latest_score(attempts=attempts),
     }
 
 
@@ -378,13 +390,10 @@ def assemble_employee_dashboard(
             "manager": up.get("manager"),
         },
         "summary": {
-            # Derived only from response values (no invented constants).
             "currentSkillScore": sp.get("currentSkillScore"),
-            # No response attribute for learning progress yet.
-            "learningProgress": None,
+            "learningProgress": asmt.get("learning_progress"),
             "quizAverage": asmt.get("quizAverage"),
-            # No response attribute for certifications yet.
-            "certificationsEarned": None,
+            "certificationsEarned": asmt.get("certifications_earned"),
         },
         "charts": {
             # No time-series in any upstream response yet.
@@ -395,7 +404,7 @@ def assemble_employee_dashboard(
         "analytics": {
             "strongestSkill": sp.get("strongestSkill"),
             "weakestSkill": sp.get("weakestSkill"),
-            "quizPassRate": asmt.get("quizPassRate"),
+            "quizPassRate": asmt.get("quizAverage"),
         },
         "roadmap": roadmap or dict(_EMPTY_ROADMAP),
     }
