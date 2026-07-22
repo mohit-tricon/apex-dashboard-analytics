@@ -103,6 +103,31 @@ class SkillProfilerIntegration(BaseIntegration):
 
         return response.json()
 
+    def get_manager_team(self, manager_id: str) -> dict[str, Any]:
+        """Fetch an employee's skill profile."""
+        """Expected Response 
+        [
+            {
+                "userId": "string",
+                "username": "string",
+                "email": "string",
+                "role": "ADMIN",
+                "reportsTo": "string",
+                "reportsToName": "string",
+                "assessmentCount": 0,
+                "createdAt": "2026-07-21T13:04:16.745Z"
+            }
+        ]
+        """
+
+        response = self.make_request(
+            "GET",
+            "/api/v1/users",
+            headers={**self.default_headers, "X-Acting-Employee-Id": manager_id},
+        )
+
+        return response.json()
+
     def list_skills(self, *, params: Mapping[str, Any] | None = None) -> dict[str, Any]:
         """List available skills (optionally filtered via query params)."""
         response = self.make_request("GET", "/skills", params=params)

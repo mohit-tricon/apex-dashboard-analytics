@@ -11,6 +11,7 @@ sensible defaults) rather than raise on shape drift.
 
 from __future__ import annotations
 
+from collections import Counter
 from statistics import mean
 from typing import Any
 
@@ -350,4 +351,244 @@ def assemble_employee_dashboard(
             "quizPassRate": asmt.get("quizPassRate"),
         },
         "roadmap": roadmap or dict(_EMPTY_ROADMAP),
+    }
+
+
+# --------------------------------------------------------------------------- #
+# Manager dashboard
+# --------------------------------------------------------------------------- #
+def parse_manager_profile(raw: dict[str, Any] | None) -> dict[str, Any]:
+    """Parse the manager's own profile (SkillProfiler /me) -> manager block."""
+    raw = raw or {}
+    return {
+        "id": raw.get("userId"),
+        "name": raw.get("username"),
+        # /me does not expose department; None until an upstream provides it.
+        "department": raw.get("department"),
+    }
+
+
+def parse_manager_team(raw: Any) -> list[dict[str, Any]]:
+    """Parse the manager's team list (SkillProfiler /api/v1/users) -> member summaries.
+
+    The /api/v1/users response is a list of users with basic info.
+    We map what's available; fields not provided by the upstream are left as None.
+    """
+    team = _as_list(raw)
+    members = []
+    for user in team:
+        if not isinstance(user, dict):
+            continue
+        members.append(
+            {
+                "employeeId": user.get("userId"),
+                "name": user.get("username"),
+                # The team endpoint does not provide these; they would need per-employee detail calls.
+                "skillScore": None,
+                "learningProgress": None,
+                "skills": {},
+                "skillGaps": [],
+                "quizAverage": None,
+                "quizPassRate": None,
+                "certificationRatio": None,
+            }
+        )
+    return members
+
+
+def parse_member_summary(
+    *,
+    employee_id: str | None,
+    name: str | None,
+    skill_profile: dict[str, Any] | None = None,
+    assessments: dict[str, Any] | None = None,
+    roadmap: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Assemble a single team-member summary from per-employee detail calls.
+
+    Fields that the upstream does not provide are left as None.
+    """
+    sp = skill_profile or {}
+    asmt = assessments or {}
+    lp = None
+    if roadmap:
+        lp = roadmap.get("completionPercentage")
+    return {
+        "employeeId": employee_id,
+        "name": name,
+        "skillScore": sp.get("currentSkillScore"),
+        "learningProgress": lp,
+        "skills": sp.get("skills") or {},
+        "skillGaps": sp.get("skillGaps") or [],
+        "quizAverage": asmt.get("quizAverage"),
+        "quizPassRate": asmt.get("quizPassRate"),
+        "certificationRatio": asmt.get("certificationRatio"),
+    }
+
+
+def _team_skill_distribution(members: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    counter: Counter[str] = Counter()
+    for member in members:
+        for skill in member.get("skills") or {}:
+            counter[skill] += 1
+    return [
+        {"skill": skill, "employees": count} for skill, count in counter.most_common()
+    ]
+
+
+def _team_skill_gaps(members: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    counter: Counter[str] = Counter()
+    for member in members:
+        for gap in member.get("skillGaps") or []:
+            skill = gap.get("skill") if isinstance(gap, dict) else None
+            if skill:
+                counter[skill] += 1
+    return [
+        {"skill": skill, "employeesAffected": count}
+        for skill, count in counter.most_common()
+    ]
+
+
+def assemble_manager_dashboard(
+    manager_id: str,
+    *,
+    manager: dict[str, Any] | None,
+    members: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Assemble the ``managers.json`` shape.
+
+    ``members`` is a list of parsed per-employee summaries (each optionally
+    carrying ``employeeId``, ``name``, ``skillScore``, ``learningProgress``,
+    ``skills``, ``skillGaps``, ``quizAverage``, ``quizPassRate``,
+    ``certificationRatio``). Team rollups are computed only from this
+    response-derived data; when no members are available the team sections are
+    ``[]`` / ``None`` (nothing fabricated).
+    """
+    m = manager or {}
+    members = [x for x in (members or []) if isinstance(x, dict)]
+
+    skill_scores = _numbers([x.get("skillScore") for x in members])
+    progress = _numbers([x.get("learningProgress") for x in members])
+    quiz_avgs = _numbers([x.get("quizAverage") for x in members])
+    pass_rates = _numbers([x.get("quizPassRate") for x in members])
+    cert_ratios = _numbers([x.get("certificationRatio") for x in members])
+
+    scored = [x for x in members if isinstance(x.get("skillScore"), (int, float))]
+    top = max(scored, key=lambda x: x["skillScore"], default=None)
+    low = min(scored, key=lambda x: x["skillScore"], default=None)
+
+    return {
+        "manager": {
+            "id": m.get("id") or manager_id,
+            "name": m.get("name"),
+            "department": m.get("department"),
+        },
+        "summary": {
+            "teamSize": len(members) if members else None,
+            "averageSkillScore": round(mean(skill_scores)) if skill_scores else None,
+            "averageLearningProgress": round(mean(progress)) if progress else None,
+            "pendingTrainings": (
+                sum(len(x.get("skillGaps") or []) for x in members) if members else None
+            ),
+            "certificationCompletion": (
+                round(mean(cert_ratios) * 100) if cert_ratios else None
+            ),
+        },
+        "charts": {"teamSkillDistribution": _team_skill_distribution(members)},
+        "skillGaps": _team_skill_gaps(members),
+        "teamMembers": [
+            {
+                "employeeId": x.get("employeeId"),
+                "name": x.get("name"),
+                "skillScore": x.get("skillScore"),
+                "learningProgress": x.get("learningProgress"),
+            }
+            for x in members
+        ],
+        "analytics": {
+            "topPerformer": top.get("name") if top else None,
+            "lowestPerformer": low.get("name") if low else None,
+            "trainingCompletionRate": round(mean(pass_rates)) if pass_rates else None,
+            "averageQuizScore": round(mean(quiz_avgs), 1) if quiz_avgs else None,
+        },
+    }
+
+
+# --------------------------------------------------------------------------- #
+# Executive dashboard
+# --------------------------------------------------------------------------- #
+def parse_org_overview(raw: dict[str, Any] | None) -> dict[str, Any]:
+    """Parse the AI Tutor org overview response (defensive passthrough).
+
+    Kept as a light passthrough: the executive assembler pulls the fields it
+    recognizes and defaults the rest, so new overview fields flow through
+    without code changes.
+    """
+    return raw or {}
+
+
+def _department_analytics(departments: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            "department": d.get("department"),
+            "employees": d.get("employees"),
+            "avgSkillScore": d.get("avgSkillScore"),
+            "completion": d.get("completion"),
+        }
+        for d in departments
+    ]
+
+
+def assemble_executive_dashboard(
+    *,
+    name: str | None = None,
+    overview: dict[str, Any] | None = None,
+    departments: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Assemble the ``executive.json`` shape.
+
+    ``departments`` is a list of response-derived per-department rollups (each
+    optionally carrying ``department``, ``employees``, ``avgSkillScore``,
+    ``completion``, ``readinessScore``). Fields with no upstream source are
+    ``None`` / ``[]`` (nothing fabricated).
+    """
+    overview = overview or {}
+    departments = [d for d in (departments or []) if isinstance(d, dict)]
+
+    dept_scores = _numbers([d.get("avgSkillScore") for d in departments])
+    scored = [
+        d for d in departments if isinstance(d.get("avgSkillScore"), (int, float))
+    ]
+    highest = max(scored, key=lambda d: d["avgSkillScore"], default=None)
+    lowest = min(scored, key=lambda d: d["avgSkillScore"], default=None)
+
+    return {
+        "Executive": {
+            "name": name,
+            "departments": len(departments) if departments else None,
+        },
+        "summary": {
+            "overallAIReadiness": overview.get("overall_ai_readiness"),
+            "overallLearningCompletion": overview.get("overall_learning_completion"),
+            "trainingROI": overview.get("training_roi"),
+            "trainingCost": overview.get("training_cost"),
+            "certificationRate": overview.get("certification_rate"),
+            "averageSkillScore": round(mean(dept_scores)) if dept_scores else None,
+        },
+        "charts": {
+            "departmentReadiness": [
+                {"department": d.get("department"), "score": d.get("readinessScore")}
+                for d in departments
+                if d.get("readinessScore") is not None
+            ],
+            # No monthly time-series in any upstream response yet.
+            "monthlyAIReadinessTrend": [],
+        },
+        "departmentAnalytics": _department_analytics(departments),
+        "analytics": {
+            "highestPerformingDepartment": (
+                highest.get("department") if highest else None
+            ),
+            "lowestPerformingDepartment": lowest.get("department") if lowest else None,
+        },
     }
