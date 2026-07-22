@@ -6,7 +6,7 @@ training completion, and certification status.
 
 from __future__ import annotations
 
-from fastapi import HTTPException
+from fastapi import HTTPException, Query
 from fastapi.routing import APIRouter
 
 from apex_dashboard_analytics.data import mock_data, mock_json
@@ -16,21 +16,33 @@ from apex_dashboard_analytics.schemas import (
     TeamSkillDistributionEntry,
     TrainingCompletionEntry,
 )
+from apex_dashboard_analytics.services.dashboard_service import ManagerDashboardService
 
 manager_router = APIRouter(prefix="/manager", tags=["manager"])
 
 
 @manager_router.get("/{manager_id}/dashboard")
-def get_manager_dashboard(manager_id: str):
+async def get_manager_dashboard(
+    manager_id: str,
+    use_actual_data: bool = Query(
+        default=False,
+        description="When true, assemble the dashboard from live integrations. "
+        "Defaults to false, which returns mock data from data/managers.json.",
+    ),
+):
     """Single aggregated payload for rendering the whole Manager View.
 
     In mock mode the payload is read from ``data/managers.json``.
     """
-    data = mock_json.get_manager_dashboard(manager_id)
-    if data is None:
-        raise HTTPException(status_code=404, detail=f"Manager '{manager_id}' not found")
-    return data
-    return mock_data.get_manager_dashboard(manager_id)
+    if not use_actual_data:
+        data = mock_json.get_manager_dashboard(manager_id)
+        if data is None:
+            raise HTTPException(
+                status_code=404, detail=f"Manager '{manager_id}' not found"
+            )
+        return data
+
+    return await ManagerDashboardService(manager_id=manager_id).build()
 
 
 @manager_router.get(
