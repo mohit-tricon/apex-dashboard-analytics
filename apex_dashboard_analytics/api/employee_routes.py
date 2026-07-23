@@ -36,7 +36,7 @@ employee_router = APIRouter(prefix="/employees", tags=["employee"])
 async def get_employee_dashboard(
     employee_id: str,
     use_actual_data: bool = Query(
-        default=False,
+        default=True,
         description="When true, assemble the dashboard from live integrations. "
         "Defaults to false, which returns mock data from data/employees.json.",
     ),
