@@ -19,7 +19,7 @@ manager_router = APIRouter(prefix="/manager", tags=["manager"])
 async def get_manager_dashboard(
     manager_id: str,
     use_actual_data: bool = Query(
-        default=False,
+        default=True,
         description="When true, assemble the dashboard from live integrations. "
         "Defaults to false, which returns mock data from data/managers.json.",
     ),

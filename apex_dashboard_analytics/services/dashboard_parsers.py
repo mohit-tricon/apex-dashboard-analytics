@@ -509,13 +509,120 @@ def parse_member_summary(
     }
 
 
+_SKILL_GROUPS: dict[str, list[str]] = {
+    "Backend": [
+        "python",
+        "java",
+        "go",
+        "rust",
+        "c++",
+        "c#",
+        "kotlin",
+        "scala",
+        "node.js",
+        "node",
+        "typescript",
+        "spring",
+        "django",
+        "fastapi",
+        "flask",
+        "graphql",
+        "rest",
+        "grpc",
+        "sql",
+        "postgresql",
+        "postgres",
+        "mysql",
+        "mongodb",
+        "redis",
+        "elasticsearch",
+        "rabbitmq",
+        "kafka",
+    ],
+    "Frontend": [
+        "react",
+        "vue",
+        "angular",
+        "javascript",
+        "typescript",
+        "html",
+        "css",
+        "next.js",
+        "nextjs",
+        "svelte",
+        "tailwind",
+        "redux",
+        "webpack",
+    ],
+    "DevOps": [
+        "docker",
+        "kubernetes",
+        "k8s",
+        "aws",
+        "gcp",
+        "azure",
+        "terraform",
+        "ci/cd",
+        "cicd",
+        "jenkins",
+        "gitops",
+        "helm",
+        "ansible",
+        "linux",
+        "bash",
+        "prometheus",
+        "grafana",
+    ],
+    "AI": [
+        "machine learning",
+        "deep learning",
+        "nlp",
+        "tensorflow",
+        "pytorch",
+        "llm",
+        "rag",
+        "openai",
+        "langchain",
+        "generative ai",
+        "genai",
+        "ai",
+        "ml",
+    ],
+    "DataEngineer": [
+        "spark",
+        "hadoop",
+        "airflow",
+        "etl",
+        "data warehouse",
+        "datawarehouse",
+        "bigquery",
+        "snowflake",
+        "dbt",
+        "databricks",
+        "pandas",
+        "numpy",
+        "tableau",
+        "power bi",
+    ],
+}
+
+
+def _skill_group(skill: str) -> str:
+    lowered = skill.lower().strip()
+    for group, keywords in _SKILL_GROUPS.items():
+        for kw in keywords:
+            if kw in lowered:
+                return group
+    return "Others"
+
+
 def _team_skill_distribution(members: list[dict[str, Any]]) -> list[dict[str, Any]]:
     counter: Counter[str] = Counter()
     for member in members:
         for skill in member.get("skills") or {}:
-            counter[skill] += 1
+            counter[_skill_group(skill)] += 1
     return [
-        {"skill": skill, "employees": count} for skill, count in counter.most_common()
+        {"skill": group, "employees": count} for group, count in counter.most_common()
     ]
 
 
@@ -525,10 +632,10 @@ def _team_skill_gaps(members: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for gap in member.get("skillGaps") or []:
             skill = gap.get("skill") if isinstance(gap, dict) else None
             if skill:
-                counter[skill] += 1
+                counter[_skill_group(skill)] += 1
     return [
-        {"skill": skill, "employeesAffected": count}
-        for skill, count in counter.most_common()
+        {"skill": group, "employeesAffected": count}
+        for group, count in counter.most_common()
     ]
 
 
