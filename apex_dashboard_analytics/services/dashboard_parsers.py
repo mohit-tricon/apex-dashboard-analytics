@@ -81,11 +81,35 @@ def parse_skill_profile(raw: Any) -> dict[str, Any]:
         if isinstance(v, (int, float)) and not isinstance(v, bool)
     }
 
-    distribution = [{"skill": name, "score": score} for name, score in skills.items()]
+    sorted_skills = sorted(
+        skills.items(),
+        key=lambda x: x[1] if isinstance(x[1], (int, float)) else -1,
+        reverse=True,
+    )
+    distribution = [
+        {"skill": name, "score": score * 10 if score < 10 else score}
+        for name, score in sorted_skills[:5]
+    ]
+
+    skill_gaps_list = record.get("skillGaps")
+
+    skill_gaps: dict = {
+        skill.get("skill"): skill.get("requiredLevel") for skill in skill_gaps_list
+    }
+
+    sorted_gaps = sorted(
+        skill_gaps.items(),
+        key=lambda x: x[1] if isinstance(x[1], (int, float)) else -1,
+        reverse=True,
+    )
     gaps = [
-        {"skill": g.get("skill"), "requiredLevel": g.get("requiredLevel")}
-        for g in _as_list(record.get("skillGaps"))
-        if isinstance(g, dict)
+        {
+            "skill": skill,
+            "requiredLevel": required_level * 10
+            if required_level < 10
+            else required_level,
+        }
+        for skill, required_level in sorted_gaps[:5]
     ]
 
     return {
@@ -126,17 +150,19 @@ def _get_average_latest_score(attempts: list) -> int:
             latest_attempts[course_id] = {
                 "score": attempt["score"],
                 "attempted_on": attempted_on,
+                "status": attempt["status"],
             }
 
-    # Extract scores from the latest attempts
     latest_scores = [item.get("score", 0) for item in latest_attempts.values()]
-    latest_passed = sum(
+    latest_passed_count = sum(
         1 for item in latest_attempts.values() if item.get("status") == "pass"
     )
-    learning_progress = round((latest_passed / len(latest_attempts)) * 100, 2)
+    count = len(latest_attempts)
+    learning_progress = round((latest_passed_count / count) * 100, 2) if count else 0.0
 
+    raw_avg = sum(latest_scores) / len(latest_scores) if latest_scores else 0
     return {
-        "quizAverage": sum(latest_scores) / len(latest_scores),
+        "quizAverage": round(raw_avg * 10, 1),
         "learning_progress": learning_progress,
     }
 
@@ -335,7 +361,7 @@ def parse_roadmap(raw: Any) -> dict[str, Any]:
                 {
                     "course_name": course.get("course_name"),
                     "provider": course.get("provider"),
-                    "url": course.get("url"),
+                    # "description": course.get("url"),
                 }
             )
 
@@ -399,6 +425,7 @@ def assemble_employee_dashboard(
             # No time-series in any upstream response yet.
             "skillTrend": [],
             "skillDistribution": sp.get("skillDistribution") or [],
+            "skillGaps": sp.get("skillGaps"),
         },
         "course_recommendations": rd.get("course_recommendations", []),
         "analytics": {
