@@ -2,6 +2,8 @@ from fastapi.routing import APIRouter
 
 from apex_dashboard_analytics.api.employee_routes import employee_router
 from apex_dashboard_analytics.api.executive_routes import executive_router
+from apex_dashboard_analytics.api.flowcharts_routes import flowcharts_router
+from apex_dashboard_analytics.api.formulas_routes import formulas_router
 from apex_dashboard_analytics.api.health_routes import health_router
 from apex_dashboard_analytics.api.manager_routes import manager_router
 # from apex_dashboard_analytics.api.quiz_routes import quiz_router
@@ -15,6 +17,8 @@ v1_router = APIRouter()
 v1_router.include_router(employee_router)
 v1_router.include_router(manager_router)
 v1_router.include_router(executive_router)
+v1_router.include_router(flowcharts_router)
+v1_router.include_router(formulas_router)
 # v1_router.include_router(quiz_router)
 # v1_router.include_router(tutor_router)
 
