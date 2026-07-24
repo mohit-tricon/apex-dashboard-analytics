@@ -9,22 +9,22 @@ from __future__ import annotations
 from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
 
-from apex_dashboard_analytics.formulas import FORMULAS, get_formulas_html
+from apex_dashboard_analytics.formulas import get_formulas_html
 
 formulas_router = APIRouter(prefix="/formulas", tags=["formulas"])
 
 
-@formulas_router.get("")
-@formulas_router.get("/")
-async def get_formulas_root():
-    """Redirect to /formulas/json or /formulas/html."""
-    return {"json": "/formulas/json", "html": "/formulas/html"}
+# @formulas_router.get("")
+# @formulas_router.get("/")
+# async def get_formulas_root():
+#     """Redirect to /formulas/json or /formulas/html."""
+#     return {"json": "/formulas/json", "html": "/formulas/html"}
 
 
-@formulas_router.get("/json")
-async def get_formulas_json():
-    """Return all formulas as structured JSON."""
-    return FORMULAS
+# @formulas_router.get("/json")
+# async def get_formulas_json():
+#     """Return all formulas as structured JSON."""
+#     return FORMULAS
 
 
 @formulas_router.get("/html", response_class=HTMLResponse)

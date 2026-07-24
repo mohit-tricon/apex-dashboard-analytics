@@ -8,8 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import HTTPException
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
 
 _FLOWCHART_DIR = Path(__file__).resolve().parents[2] / "flowcharts"
@@ -28,28 +27,28 @@ def _list_flowcharts() -> list[dict[str, str]]:
     return charts
 
 
-@flowcharts_router.get("")
-@flowcharts_router.get("/")
-async def list_flowcharts():
-    """List available flowcharts."""
-    charts = _list_flowcharts()
-    return {
-        "flowcharts": charts,
-        "endpoints": {
-            "html": "/api/v1/flowcharts/view",
-            "raw": "/api/v1/flowcharts/{name}/raw",
-        },
-    }
+# @flowcharts_router.get("")
+# @flowcharts_router.get("/")
+# async def list_flowcharts():
+#     """List available flowcharts."""
+#     charts = _list_flowcharts()
+#     return {
+#         "flowcharts": charts,
+#         "endpoints": {
+#             "html": "/api/v1/flowcharts/view",
+#             "raw": "/api/v1/flowcharts/{name}/raw",
+#         },
+#     }
 
 
-@flowcharts_router.get("/{name}/raw", response_class=PlainTextResponse)
-async def get_flowchart_raw(name: str):
-    """Return the raw Mermaid markdown for a flowchart."""
-    charts = _list_flowcharts()
-    if not any(c["name"] == name for c in charts):
-        raise HTTPException(status_code=404, detail=f"Flowchart '{name}' not found")
-    content = (_FLOWCHART_DIR / f"{name}.md").read_text(encoding="utf-8")
-    return content
+# @flowcharts_router.get("/{name}/raw", response_class=PlainTextResponse)
+# async def get_flowchart_raw(name: str):
+#     """Return the raw Mermaid markdown for a flowchart."""
+#     charts = _list_flowcharts()
+#     if not any(c["name"] == name for c in charts):
+#         raise HTTPException(status_code=404, detail=f"Flowchart '{name}' not found")
+#     content = (_FLOWCHART_DIR / f"{name}.md").read_text(encoding="utf-8")
+#     return content
 
 
 @flowcharts_router.get("/view", response_class=HTMLResponse)
